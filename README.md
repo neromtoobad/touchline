@@ -37,7 +37,7 @@ You take over Ashford Town with three matches to win a four-club league. Each op
 
 - `api/serv.js`: the SERV calls (manager personas, schemas, Prompt Guard) as one Vercel function
 - `public/game.js`: squads, match engine, scouting and half-time reports, league table
-- `public/index.html`: the game UI
+- `public/index.html`: the game UI (tactics board, animated 2D match view, momentum chart, dressing room, notebook)
 - Scenes and manager portraits were generated with Higgsfield.
 
 Run locally with `vercel dev` and `SERV_API_KEY` set.
