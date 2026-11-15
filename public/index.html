@@ -227,7 +227,7 @@ function crest(c, s = 44) {
   if (LOGO[c.id] || /^o\d+$/.test(c.id)) return `<img src="/img/crest-${c.id}.jpg" alt="" width="${s}" height="${s}" style="width:${s}px;height:${s}px;border-radius:24%;flex:none;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.28)">`;
   return `<span style="width:${s}px;height:${s}px;border-radius:24%;flex:none;display:inline-grid;place-items:center;background:${c.color};color:#fff;font:800 ${Math.round(s * 0.42)}px 'Barlow Condensed';letter-spacing:.02em">${c.short.slice(0, s < 30 ? 1 : 3)}</span>`;
 }
-function faceCss(p) { const i = p.face || 0, k = i % 9, S = 3.5, pos = (c) => (((c * S - 0.5) / (S - 1)) * 100).toFixed(1); return `background-image:url(/img/faces${i < 9 ? 1 : 2}.jpg);background-size:${S * 100}%;background-position:${pos(((k % 3) + 0.5) / 3)}% ${pos((Math.floor(k / 3) + 0.45) / 3)}%`; }
+function faceCss(p) { const i = p.face || 0, k = i % 9, S = 3.5, pos = (c) => (((c * S - 0.5) / (S - 1)) * 100).toFixed(1); return `background-image:url(/img/faces${Math.floor(i / 9) + 1}.jpg);background-size:${S * 100}%;background-position:${pos(((k % 3) + 0.5) / 3)}% ${pos((Math.floor(k / 3) + 0.45) / 3)}%`; }
 const face = (p, s) => `<span class="av" style="width:${s}px;height:${s}px;${faceCss(p)}"></span>`;
 const MG = { style: 'motivator', name: '' };
 const STYLES = {
@@ -236,20 +236,30 @@ const STYLES = {
   sergeant: { name: 'The Sergeant', img: 'mgr-sergeant', line: 'Nobody outruns your team.', perk: '+8 STAMINA FOR THE WHOLE SQUAD' },
 };
 const BLURB = [
-  'Harrow Vale are top and unbeaten in nine. Blank\'s side have let in two goals in six games. Beat them and you go level on points with the leaders.',
+  'Opening day, and it is last season\'s champions. Blank\'s sides barely concede. Everyone starts on zero, so a win here puts you top.',
   'Away at the loudest ground in the country. Ortega\'s press has forced more mistakes than any side in the league, and she has now seen you play.',
-  'The final day. Ferrier has had two matches to study you. Whatever you did to get here, he has watched it twice.',
+  'Third game. Ferrier has had two matches to study you. Whatever you did to get here, he has watched it twice.',
 ];
-function playerModal(p) {
+function playerModal(p, buy) {
   const q = p.ref || p, ov = document.createElement('div'); ov.className = 'overlay'; ov.style.background = 'rgba(8,9,12,.78)';
   const bar = (l, v) => `<div class="row"><span class="pos" style="width:64px">${l}</span><div class="bar"><i style="width:${v}%;background:#6E86FF"></i></div><span class="pill">${v}</span></div>`;
   ov.innerHTML = `<div class="modal" style="max-width:760px"><div class="pm"><div class="ph" style="${faceCss(q)}"></div><div>
     <div class="small mono">${q.pos} · AGE ${q.age} · ${q.trait.toUpperCase()}</div><div class="cond" style="font-size:44px;font-weight:800;line-height:1">${esc(q.name)}</div>
     <p class="storyp" style="margin:12px 0 14px">${esc(q.story)}</p>
     ${bar('ATTACK', q.att)}${bar('DEFENCE', q.def)}${bar('STAMINA', q.sta)}${bar('MORALE', q.morale * 10)}
-    <div class="small" style="margin-top:10px">${q.goals} goal${q.goals === 1 ? '' : 's'} in the run-in · overall ${q.ovr}</div>
-    <button class="btn ghost" style="margin-top:14px;padding:9px 18px;font-size:16px" id="pmx">Close</button></div></div></div>`;
+    <div class="small" style="margin-top:10px">${q.goals} goal${q.goals === 1 ? '' : 's'} this season · overall ${q.ovr} · value £${val(q)}m</div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center"><button class="btn" style="padding:9px 18px;font-size:16px" id="pmt"></button><button class="btn ghost" style="padding:9px 18px;font-size:16px" id="pmx">Close</button><span class="small" id="pmn"></span></div></div></div></div>`;
   document.body.appendChild(ov); ov.onclick = (e) => { if (e.target === ov || e.target.id === 'pmx') ov.remove(); };
+  const sq = CLUBS.you.squad, bt = ov.querySelector('#pmt'), nt = ov.querySelector('#pmn'), MIN = { GK: 1, DF: 5, MF: 5, FW: 3 }, price = val(q);
+  if (buy) {
+    bt.textContent = `Sign for £${price}m`; nt.textContent = `From ${q.from} · you have £${state.budget}m`;
+    if (state.budget < price) { bt.disabled = true; nt.textContent = `You only have £${state.budget}m`; }
+    bt.onclick = () => { state.budget -= price; sq.push(q); MARKET.splice(MARKET.indexOf(q), 1); ov.remove(); drawBoard(); };
+  } else if ($('#ko')) {
+    bt.textContent = `Sell for £${price}m`;
+    if (sq.filter((x) => x.pos === q.pos).length <= MIN[q.pos]) { bt.disabled = true; nt.textContent = `You need at least ${MIN[q.pos]} ${q.pos}`; }
+    bt.onclick = () => { state.budget += price; sq.splice(sq.indexOf(q), 1); MARKET.push({ ...q, from: 'Ashford Town' }); ov.remove(); drawBoard(); };
+  } else bt.remove();
 }
 
 // ---------- sound ----------
@@ -296,7 +306,7 @@ function title() {
     <div class="mgrs">${['blank', 'ortega', 'ferrier'].map((id) => `<div class="mgr"><img src="${IMG[id]}" alt=""><div><b>${CLUBS[id].manager}</b><span>${CLUBS[id].name} · ${CLUBS[id].tag}</span></div></div>`).join('')}</div>
     <button class="btn" id="go">Take the job</button>
   </div></section>`;
-  $('#go').onclick = () => { audio(); ['dressing', 'champions', 'sacked', 'stadium', 'faces1', 'faces2', 'mgr-motivator', 'mgr-tactician', 'mgr-sergeant', 'crest-you', 'crest-blank', 'crest-ortega', 'crest-ferrier'].forEach((n) => { new Image().src = `/img/${n}.jpg`; }); setup(); };
+  $('#go').onclick = () => { audio(); ['dressing', 'champions', 'sacked', 'stadium', 'faces1', 'faces2', 'faces3', 'mgr-motivator', 'mgr-tactician', 'mgr-sergeant', 'crest-you', 'crest-blank', 'crest-ortega', 'crest-ferrier'].forEach((n) => { new Image().src = `/img/${n}.jpg`; }); setup(); };
 }
 function setup() {
   window.scrollTo(0, 0);
@@ -305,9 +315,9 @@ function setup() {
   app.innerHTML = `<section class="setup"><div class="sin">
     <div class="letter"><h4>ASHFORD TOWN FC · OFFICE OF THE CHAIRMAN</h4>
       <p>Welcome to Ashford. I'll keep this short, because we don't have long.</p>
-      <p>There are three matches left. We are fourth, three points off the top, and the three sides above us are the three sides we still have to play.</p>
-      <table>${top.map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td>${r.pts}</td></tr>`).join('')}</table>
-      <p>Blank, Ortega and Ferrier will each study what you did the week before. Win all three and this town has its first title in 61 years. Anything else and we'll both be looking for work.</p>
+      <p>The season starts on Saturday and the fixture list has not been kind. Our first three matches are against last year's top three.</p>
+      <table style="display:none">${top.map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td>${r.pts}</td></tr>`).join('')}</table>
+      <p>Blank, Ortega and Ferrier will each study what you did the week before. I have found you £12m for the squad. Spend it well, sell who you must, and be top of this league after three games. Otherwise we'll both be looking for work.</p>
       <div class="sig">M. Halloran</div><div style="font:600 11px 'JetBrains Mono';color:#6D727B">CHAIRMAN</div></div>
     <div><div class="cond" style="color:#9DB0FF;font-size:16px;letter-spacing:.14em">Before you sign</div>
       <div class="cond" style="font-size:56px;font-weight:800;line-height:.95;margin:4px 0 14px">What kind of manager are you?</div>
@@ -344,11 +354,11 @@ function prematch() {
   app.innerHTML = topbar() + `<div class="wrap">
     <section class="fixture"><div class="fin">
       <div class="side">${crest(CLUBS.you, 58)}<div><h2>Ashford Town</h2><span>YOU · ${fx.home ? 'HOME' : 'AWAY'}</span></div></div>
-      <div class="vs"><span>MATCHDAY ${state.md + 36} OF 38</span><b>VS</b></div>
+      <div class="vs"><span>MATCHDAY ${state.md + 1} OF 38</span><b>VS</b></div>
       <div class="side r"><div><h2>${opp.name}</h2><span>${opp.tag.toUpperCase()}</span></div>${crest(opp, 58)}</div>
       <div class="boss"><img src="${IMG[fx.opp]}" alt=""><div><b>${opp.manager}</b><em>${opp.line}</em><div class="status" id="oppstatus"><span class="pulse"></span>${last} ${steps[0]}</div></div></div>
     </div></section>
-    <div class="strip"><b>THE RUN-IN</b><span>${BLURB[state.md]} You are ${ord(table().findIndex((r) => r.id === 'you') + 1)}, ${table()[0].pts - table().find((r) => r.id === 'you').pts} point${table()[0].pts - table().find((r) => r.id === 'you').pts === 1 ? '' : 's'} off the top with ${3 - state.md} to play.</span></div>
+    <div class="strip"><b>THE STORY</b><span>${BLURB[state.md]}${state.md ? ` You are ${ord(table().findIndex((r) => r.id === 'you') + 1)} after ${state.md} game${state.md === 1 ? '' : 's'}.` : ''}</span></div>
     <div class="hub">
       <div class="tile"><div class="th">Tactics board <span class="mono" id="fl" style="font-size:12px;color:var(--lime)"></span></div><canvas id="pc"></canvas></div>
       <div class="tile"><div class="th">Team instructions</div><div class="tb tg">
@@ -365,7 +375,8 @@ function prematch() {
         <div class="tile"><div class="th">Their dangermen</div><div class="tb" style="padding:8px 16px">${threats.map((p) => `<div class="row"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><div class="bar" style="max-width:90px"><i style="width:${p.att}%"></i></div><span class="pill">${p.att}</span></div>`).join('')}</div></div>
       </div>
     </div>
-    <div class="tile" style="margin-top:18px"><div class="th">Your squad <span class="mono" style="font-size:11px">TAP A PLAYER FOR HIS STORY</span></div><div class="tb"><div class="squad" id="squad"></div></div></div>
+    <div class="tile" style="margin-top:18px"><div class="th">Your squad <span class="mono" style="font-size:11px">TAP A PLAYER FOR HIS STORY, OR TO SELL HIM</span></div><div class="tb"><div class="squad" id="squad"></div></div></div>
+    <div class="tile" style="margin-top:18px"><div class="th">Transfer market <span class="mono" style="font-size:12px;color:var(--lime)" id="bud"></span></div><div class="tb"><div class="squad" id="market"></div></div></div>
     </div>`;
   bindTop();
   app.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); drawBoard(); })));
@@ -407,6 +418,7 @@ function drawBoard() {
   }
   const names = xi.map((p) => p.name), sqd = [...CLUBS.you.squad].sort((a, b) => names.includes(b.name) - names.includes(a.name) || b.ovr - a.ovr);
   const sqEl = $('#squad'); if (sqEl) { sqEl.innerHTML = sqd.map((p, n) => `<button class="pc ${names.includes(p.name) ? 'in' : ''}" data-n="${n}"><div class="ph" style="${faceCss(p)}"></div><span class="ov">${p.ovr}</span><span class="ps">${p.pos}</span><b>${esc(p.name)}</b><span class="t">${p.age} · ${p.trait}</span></button>`).join(''); sqEl.querySelectorAll('.pc').forEach((b) => (b.onclick = () => playerModal(sqd[+b.dataset.n]))); }
+  const mk = $('#market'); if (mk) { mk.innerHTML = MARKET.map((p, n) => `<button class="pc" data-n="${n}"><div class="ph" style="${faceCss(p)}"></div><span class="ov">${p.ovr}</span><span class="ps">${p.pos}</span><b>${esc(p.name)}</b><span class="t">${p.age} · £${val(p)}m</span></button>`).join('') || '<span class="small">Nobody left to sign.</span>'; mk.querySelectorAll('.pc').forEach((b) => (b.onclick = () => playerModal(MARKET[+b.dataset.n], true))); $('#bud').textContent = `BUDGET £${state.budget}m`; }
   $('#fl').textContent = t.formation;
   $('#hint').textContent = HINTS.press[t.press] + ' ' + HINTS.mentality[t.mentality];
 }
@@ -664,9 +676,9 @@ function fulltime() {
 function season() {
   window.scrollTo(0, 0);
   const t = table(), pos = t.findIndex((r) => r.id === 'you') + 1;
-  const img = pos === 1 ? 'champions' : pos === 2 ? 'tunnel' : 'sacked', who = esc(MG.name);
-  const head = pos === 1 ? 'Champions.' : pos === 2 ? 'So close.' : 'Sacked.';
-  const msg = pos === 1 ? `Ashford Town are champions for the first time in 61 years. Three managers studied ${who}, countered and changed things at half-time. None of them could stop it.` : pos === 2 ? `Second, by a whisker. The chairman wanted the title, and one of those managers read ${who} a little too well.` : `Ashford finish ${ord(pos)}. Mr Halloran has thanked ${who} for the effort and cleared the office.`;
+  const img = pos === 1 ? 'champions' : pos <= 4 ? 'tunnel' : 'sacked', who = esc(MG.name);
+  const head = pos === 1 ? 'Top of the league.' : pos <= 4 ? 'In the hunt.' : 'Sacked.';
+  const msg = pos === 1 ? `Three games, last season's top three, and Ashford Town lead the league. Three managers studied ${who}, countered and changed things at half-time. None of them could stop it.` : pos <= 4 ? `Ashford sit ${ord(pos)} after the hardest start in the division. The chairman wanted top spot, and one of those managers read ${who} a little too well.` : `Ashford are ${ord(pos)} after three games. Mr Halloran has thanked ${who} for the effort and cleared the office.`;
   const share = encodeURIComponent(`I finished ${ord(pos)} in Touchline, a football manager where every rival manager thinks for itself on @openservai SERV Reasoning. Can you win the league? ${location.origin}`);
   app.innerHTML = topbar() + `<section class="season" style="background-image:url(/img/${img}.jpg)"><div class="in">
     <div class="cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:8px">Final standings · ${ord(pos)} place</div>

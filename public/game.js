@@ -64,6 +64,8 @@ function simOthers(md) {
   for (let i = 0; i < rot.length; i += 2) out.push([rot[i], rot[i + 1], Math.floor(r() * 3.3), Math.floor(r() * 2.8)]);
   return out;
 }
+const MARKET = makeSquad(777, { att: 5, def: 5 }).filter((p, i) => [0, 2, 4, 8, 10, 11, 14, 15, 16].includes(i)).filter((p) => !CLUBS.you.squad.some((q) => q.name === p.name)).map((p, k) => { const from = OTHERS[(k * 3) % 16].name; return { ...p, face: 18 + k, from, story: p.story.replace('the Ashford academy', `the ${from} academy`).replace('ten minutes from the ground', 'a long way from Ashford') }; });
+const val = (p) => Math.max(1, Math.round((p.ovr - 58) * 0.55 + (30 - p.age) * 0.3));
 const FIXTURES = [
   { opp: 'blank', home: true, other: ['ortega', 'ferrier'] },
   { opp: 'ortega', home: false, other: ['blank', 'ferrier'] },
@@ -168,9 +170,9 @@ function scoutReport(oppId, md) {
   const xi = pickXI(me.squad, state.tactics.formation);
   const top = [...me.squad].sort((a, b) => b.goals - a.goals || b.att - a.att).slice(0, 3);
   const lanes = ['Left', 'Centre', 'Right'].map((l) => ({ l, d: avg(xi.filter((p) => p.slot === 'DF' && p.side === l).map((p) => p.def)) || 0 })).filter((x) => x.d).sort((a, b) => a.d - b.d);
-  const stand = table().slice(0, 5).map((t, i) => `${i + 1}. ${t.name} ${t.pts} pts (GD ${t.gd >= 0 ? '+' : ''}${t.gd})`).join('; ');
+  const stand = table().slice(0, 6).map((t, i) => `${i + 1}. ${t.name} ${t.pts} pts (GD ${t.gd >= 0 ? '+' : ''}${t.gd})`).join('; ');
   const lines = [
-    `MATCHDAY ${md + 36} of 38, the title run-in. You are ${CLUBS[oppId].name}. Opponent: Ashford Town (${FIXTURES[md].home ? 'they are at home' : 'you are at home'}).`,
+    `MATCHDAY ${md + 1} of 38, the opening weeks of a new season. You are ${CLUBS[oppId].name}. Opponent: Ashford Town (${FIXTURES[md].home ? 'they are at home' : 'you are at home'}).`,
     `LEAGUE TABLE: ${stand}.`,
     last
       ? `ASHFORD'S LAST MATCH: ${last.score[0]}-${last.score[1]} vs ${last.opp}. They played ${last.t.formation}, ${last.t.mentality}, ${last.t.press} press, attacking mostly down the ${last.t.attack_lane}. ${last.lanePct}. Possession ${last.poss}%. Shots ${last.shots}, xG ${last.xg}.`
@@ -197,16 +199,16 @@ function halftimeReport(m, oppIdx) {
 }
 
 // ---------- state ----------
-const state = { md: 0, tactics: { formation: '4-3-3', mentality: 'Balanced', press: 'Mid', attack_lane: 'Centre', mark: 'None' }, history: [], results: [], notes: [] };
+const state = { budget: 12, md: 0, tactics: { formation: '4-3-3', mentality: 'Balanced', press: 'Mid', attack_lane: 'Centre', mark: 'None' }, history: [], results: [], notes: [] };
 function table() {
-  const t = Object.values(ALL).map((c) => { const d = 8 + ((c.base - 8) % 3), w = (c.base - d) / 3, gd = Math.round((c.base - 48) * 1.1), gf = 40 + Math.round((c.base - 24) * 0.6); return { id: c.id, name: c.name, p: 35, w, d, l: 35 - w - d, gf, ga: gf - gd, gd, pts: c.base }; });
+  const t = Object.values(ALL).map((c) => ({ id: c.id, name: c.name, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, seed: c.base }));
   const get = (id) => t.find((x) => x.id === id);
   for (const [h, a, sh, sa] of state.results) {
     const H = get(h), A = get(a); H.p++; A.p++; H.gf += sh; H.ga += sa; A.gf += sa; A.ga += sh;
     if (sh > sa) { H.w++; H.pts += 3; A.l++; } else if (sh < sa) { A.w++; A.pts += 3; H.l++; } else { H.d++; A.d++; H.pts++; A.pts++; }
   }
   t.forEach((x) => (x.gd = x.gf - x.ga));
-  return t.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+  return t.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || b.seed - a.seed);
 }
 
 window.Touchline = { CLUBS, FIXTURES, FORMS, pickXI, newMatch, tick, quickSim, serv, ledger, state, table, scoutReport, halftimeReport, FALLBACK, sleep, esc, $ };
