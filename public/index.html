@@ -15,7 +15,7 @@
 <link rel="preload" as="image" href="/img/stadium.jpg">
 <style>
 :root{--bg:#F3F0E9;--panel:#FFFFFF;--panel2:#F1EEE6;--line:#E3DED2;--ink:#121316;--mute:#6D727B;--lime:#3D5BFF;--red:#E5341D;--amber:#E69A00}
-.title,.overlay,.season,.fixture,.hero{--ink:#F5F4EF;--mute:#B4BAC0;--line:rgba(255,255,255,.16);--panel:rgba(13,15,18,.86);--panel2:rgba(255,255,255,.09);--lime:#6E86FF;color:var(--ink)}
+.title,.overlay,.season,.fixture,.hero,.setup{--ink:#F5F4EF;--mute:#B4BAC0;--line:rgba(255,255,255,.16);--panel:rgba(13,15,18,.86);--panel2:rgba(255,255,255,.09);--lime:#6E86FF;color:var(--ink)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
@@ -169,8 +169,43 @@ pre{white-space:pre-wrap;background:var(--panel2);border:1px solid var(--line);b
 .season:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,8,10,.94) 0%,rgba(6,8,10,.7) 46%,rgba(6,8,10,.15) 100%)}
 .season .in{position:relative;padding:44px;max-width:640px;animation:up .7s ease both}
 .season h1{font:800 clamp(64px,9vw,128px)/.88 'Barlow Condensed';text-transform:uppercase}
+.av{border-radius:50%;background-color:#2A2F38;background-repeat:no-repeat;flex:none;display:inline-block}
+.squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:12px}
+.pc{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:10px;cursor:pointer;transition:transform .15s,box-shadow .15s;text-align:left}
+.pc:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(20,20,30,.16)}
+.pc.in{background:#fff;border-color:var(--ink)}
+.pc .ph{width:100%;aspect-ratio:1;border-radius:12px;background-color:#2A2F38;background-repeat:no-repeat}
+.pc .ov{position:absolute;top:16px;left:16px;font:800 22px 'Barlow Condensed';color:#fff;background:rgba(10,12,16,.75);padding:1px 7px;border-radius:7px}
+.pc .ps{position:absolute;top:16px;right:16px;font:600 10px 'JetBrains Mono';color:#fff;background:var(--lime);padding:3px 6px;border-radius:6px}
+.pc b{display:block;font-size:13.5px;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc span.t{font-size:11.5px;color:var(--mute)}
+.setup{position:relative;min-height:100vh;display:grid;place-items:center;padding:30px 22px;background:url(/img/stadium.jpg) center/cover}
+.setup:before{content:"";position:absolute;inset:0;background:rgba(8,9,12,.86)}
+.setup .sin{position:relative;max-width:1200px;width:100%;display:grid;grid-template-columns:.85fr 1.3fr;gap:34px;align-items:center;animation:up .6s ease both}
+.letter{background:#F6F2E7;color:#15161A;border-radius:6px;padding:30px 30px 26px;font:15.5px/1.65 Georgia,serif;box-shadow:0 30px 80px rgba(0,0,0,.55);transform:rotate(-1.2deg)}
+.letter h4{font:600 12px 'JetBrains Mono';letter-spacing:.12em;margin-bottom:14px;color:#6D727B}
+.letter p{margin-bottom:10px}.letter .sig{font:italic 22px Georgia,serif;margin-top:14px}
+.letter table{width:100%;border-collapse:collapse;font:600 13px 'JetBrains Mono';margin:6px 0 12px}.letter td{padding:5px 4px;border-bottom:1px solid #DDD6C4}.letter tr.me td{background:#15161A;color:#F6F2E7}
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.sty{position:relative;border-radius:16px;overflow:hidden;border:2px solid transparent;cursor:pointer;background-color:#15181D;aspect-ratio:3/4.2;background-size:cover;background-position:center top;text-align:left;padding:0;transition:transform .15s;opacity:.72}
+.sty:hover{transform:translateY(-4px)}
+.sty.on{border-color:#fff;box-shadow:0 0 0 4px rgba(110,134,255,.65);opacity:1}
+.sty:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,9,12,0) 30%,rgba(8,9,12,.96) 100%)}
+.sty div{position:absolute;left:14px;right:14px;bottom:12px}
+.sty b{font:800 26px/1 'Barlow Condensed';text-transform:uppercase;display:block;color:#fff}
+.sty span{font-size:12.5px;color:#C9CED3;line-height:1.4;display:block;margin-top:4px}
+.sty em{font:600 11px 'JetBrains Mono';color:#9DB0FF;font-style:normal;display:block;margin-top:6px}
+input.nm{width:100%;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font:600 17px Inter;padding:12px 14px;margin-bottom:14px}
+.storyp{font:15.5px/1.6 Georgia,serif}
+.headline{font:800 clamp(30px,4.4vw,58px)/.95 'Barlow Condensed';text-transform:uppercase;margin:4px 0 14px}
+.paper{font:600 11px 'JetBrains Mono';letter-spacing:.12em;color:var(--mute)}
+.tblwrap{max-height:318px;overflow:auto}
+.strip{display:flex;gap:14px;align-items:center;background:var(--ink);color:var(--panel);border-radius:14px;padding:13px 18px;margin-bottom:18px;font-size:15px;line-height:1.45}
+.strip b{font:800 13px 'JetBrains Mono';letter-spacing:.1em;color:#9DB0FF;white-space:nowrap}
+.pm{display:grid;grid-template-columns:240px 1fr;gap:22px;padding:22px}
+.pm .ph{width:240px;height:240px;border-radius:18px;background-color:#2A2F38;background-repeat:no-repeat}
 @media (max-width:1180px){.hub{grid-template-columns:1fr 1fr}.hub>:last-child{grid-column:1/-1}.cc{grid-template-columns:1fr 320px}.cc>:first-child{display:none}.fixture .fin{grid-template-columns:1fr auto 1fr}.boss{grid-column:1/-1;width:auto}}
-@media (max-width:820px){.hub,.cc,.end,.mgrid,.two{grid-template-columns:1fr}.mgrid>div+div{border-left:0;border-top:1px solid var(--line)}.title .in,.season .in{padding:24px 16px}.wrap{padding:14px}.big{font-size:44px}.sb h3{font-size:19px}.side h2{font-size:24px}.servchip span:not(.dot),.pips em{display:none}.ft{gap:12px;flex-wrap:wrap}.ft .n{font-size:64px}.ft h2{font-size:22px}.goalban b{font-size:90px}}
+@media (max-width:820px){.hub,.cc,.end,.mgrid,.two,.setup .sin,.pm{grid-template-columns:1fr}.mgrid>div+div{border-left:0;border-top:1px solid var(--line)}.title .in,.season .in{padding:24px 16px}.wrap{padding:14px}.big{font-size:44px}.sb h3{font-size:19px}.side h2{font-size:24px}.servchip span:not(.dot),.pips em{display:none}.ft{gap:12px;flex-wrap:wrap}.ft .n{font-size:64px}.ft h2{font-size:22px}.goalban b{font-size:90px}}
 </style>
 </head>
 <body>
@@ -187,7 +222,35 @@ const morCls = (m) => (m >= 8 ? 'g' : m >= 6 ? '' : 'b');
 const ratCls = (r) => (r >= 7.4 ? 'g' : r < 6.2 ? 'b' : '');
 const rat = (p) => clamp(p.rating || 6.5, 4, 10);
 
-function crest(c, s = 44) { return `<img src="/img/crest-${c.id}.jpg" alt="" width="${s}" height="${s}" style="width:${s}px;height:${s}px;border-radius:24%;flex:none;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.28)">`; }
+const LOGO = { you: 1, blank: 1, ortega: 1, ferrier: 1 };
+function crest(c, s = 44) {
+  if (LOGO[c.id]) return `<img src="/img/crest-${c.id}.jpg" alt="" width="${s}" height="${s}" style="width:${s}px;height:${s}px;border-radius:24%;flex:none;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.28)">`;
+  return `<span style="width:${s}px;height:${s}px;border-radius:24%;flex:none;display:inline-grid;place-items:center;background:${c.color};color:#fff;font:800 ${Math.round(s * 0.42)}px 'Barlow Condensed';letter-spacing:.02em">${c.short.slice(0, s < 30 ? 1 : 3)}</span>`;
+}
+function faceCss(p) { const i = p.face || 0, k = i % 9, S = 3.5, pos = (c) => (((c * S - 0.5) / (S - 1)) * 100).toFixed(1); return `background-image:url(/img/faces${i < 9 ? 1 : 2}.jpg);background-size:${S * 100}%;background-position:${pos(((k % 3) + 0.5) / 3)}% ${pos((Math.floor(k / 3) + 0.45) / 3)}%`; }
+const face = (p, s) => `<span class="av" style="width:${s}px;height:${s}px;${faceCss(p)}"></span>`;
+const MG = { style: 'motivator', name: '' };
+const STYLES = {
+  motivator: { name: 'The Motivator', img: 'mgr-motivator', line: 'Players run through walls for you.', perk: '+1 MORALE FOR THE WHOLE SQUAD' },
+  tactician: { name: 'The Tactician', img: 'mgr-tactician', line: 'You see the game three moves ahead.', perk: 'YOUR ANALYSTS LEAK THE RIVAL LINE-UP' },
+  sergeant: { name: 'The Sergeant', img: 'mgr-sergeant', line: 'Nobody outruns your team.', perk: '+8 STAMINA FOR THE WHOLE SQUAD' },
+};
+const BLURB = [
+  'Harrow Vale are top and unbeaten in nine. Blank\'s side have let in two goals in six games. Beat them and you go level on points with the leaders.',
+  'Away at the loudest ground in the country. Ortega\'s press has forced more mistakes than any side in the league, and she has now seen you play.',
+  'The final day. Ferrier has had two matches to study you. Whatever you did to get here, he has watched it twice.',
+];
+function playerModal(p) {
+  const q = p.ref || p, ov = document.createElement('div'); ov.className = 'overlay'; ov.style.background = 'rgba(8,9,12,.78)';
+  const bar = (l, v) => `<div class="row"><span class="pos" style="width:64px">${l}</span><div class="bar"><i style="width:${v}%;background:#6E86FF"></i></div><span class="pill">${v}</span></div>`;
+  ov.innerHTML = `<div class="modal" style="max-width:760px"><div class="pm"><div class="ph" style="${faceCss(q)}"></div><div>
+    <div class="small mono">${q.pos} · AGE ${q.age} · ${q.trait.toUpperCase()}</div><div class="cond" style="font-size:44px;font-weight:800;line-height:1">${esc(q.name)}</div>
+    <p class="storyp" style="margin:12px 0 14px">${esc(q.story)}</p>
+    ${bar('ATTACK', q.att)}${bar('DEFENCE', q.def)}${bar('STAMINA', q.sta)}${bar('MORALE', q.morale * 10)}
+    <div class="small" style="margin-top:10px">${q.goals} goal${q.goals === 1 ? '' : 's'} in the run-in · overall ${q.ovr}</div>
+    <button class="btn ghost" style="margin-top:14px;padding:9px 18px;font-size:16px" id="pmx">Close</button></div></div></div>`;
+  document.body.appendChild(ov); ov.onclick = (e) => { if (e.target === ov || e.target.id === 'pmx') ov.remove(); };
+}
 
 // ---------- sound ----------
 let AC = null, master = null, muted = false, amb = null;
@@ -233,13 +296,38 @@ function title() {
     <div class="mgrs">${['blank', 'ortega', 'ferrier'].map((id) => `<div class="mgr"><img src="${IMG[id]}" alt=""><div><b>${CLUBS[id].manager}</b><span>${CLUBS[id].name} · ${CLUBS[id].tag}</span></div></div>`).join('')}</div>
     <button class="btn" id="go">Take the job</button>
   </div></section>`;
-  $('#go').onclick = () => { audio(); ['dressing', 'champions', 'sacked', 'stadium', 'crest-you', 'crest-blank', 'crest-ortega', 'crest-ferrier'].forEach((n) => { new Image().src = `/img/${n}.jpg`; }); prematch(); };
+  $('#go').onclick = () => { audio(); ['dressing', 'champions', 'sacked', 'stadium', 'faces1', 'faces2', 'mgr-motivator', 'mgr-tactician', 'mgr-sergeant', 'crest-you', 'crest-blank', 'crest-ortega', 'crest-ferrier'].forEach((n) => { new Image().src = `/img/${n}.jpg`; }); setup(); };
+}
+function setup() {
+  window.scrollTo(0, 0);
+  const top = table().slice(0, 5), sq = CLUBS.you.squad;
+  call({ action: 'bios', players: sq.map((p) => ({ name: p.name, pos: p.pos, age: p.age, trait: p.trait })) }).then((r) => { for (const b of r.bios || []) { const p = sq.find((x) => x.name === b.name); if (p && b.story) p.story = b.story; } }).catch(() => {});
+  app.innerHTML = `<section class="setup"><div class="sin">
+    <div class="letter"><h4>ASHFORD TOWN FC · OFFICE OF THE CHAIRMAN</h4>
+      <p>Welcome to Ashford. I'll keep this short, because we don't have long.</p>
+      <p>There are three matches left. We are fourth, three points off the top, and the three sides above us are the three sides we still have to play.</p>
+      <table>${top.map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td>${r.pts}</td></tr>`).join('')}</table>
+      <p>Blank, Ortega and Ferrier will each study what you did the week before. Win all three and this town has its first title in 61 years. Anything else and we'll both be looking for work.</p>
+      <div class="sig">M. Halloran</div><div style="font:600 11px 'JetBrains Mono';color:#6D727B">CHAIRMAN</div></div>
+    <div><div class="cond" style="color:#9DB0FF;font-size:16px;letter-spacing:.14em">Before you sign</div>
+      <div class="cond" style="font-size:56px;font-weight:800;line-height:.95;margin:4px 0 14px">What kind of manager are you?</div>
+      <input class="nm" id="mname" maxlength="28" placeholder="Your name on the contract">
+      <div class="styles">${Object.entries(STYLES).map(([k, v]) => `<button class="sty ${k === MG.style ? 'on' : ''}" data-k="${k}" style="background-image:url(/img/${v.img}.jpg)"><div><b>${v.name}</b><span>${v.line}</span><em>${v.perk}</em></div></button>`).join('')}</div>
+      <button class="btn" id="sign">Sign the contract</button></div>
+  </div></section>`;
+  app.querySelectorAll('.sty').forEach((b) => (b.onclick = () => { MG.style = b.dataset.k; app.querySelectorAll('.sty').forEach((x) => x.classList.toggle('on', x === b)); }));
+  $('#sign').onclick = () => {
+    MG.name = $('#mname').value.trim() || 'The Gaffer';
+    if (MG.style === 'motivator') sq.forEach((p) => (p.morale = Math.min(10, p.morale + 1)));
+    if (MG.style === 'sergeant') sq.forEach((p) => (p.sta = Math.min(99, p.sta + 8)));
+    prematch();
+  };
 }
 
 // ---------- pre-match ----------
 let plan = null, planP = null;
 function tableHtml() {
-  return `<table class="tbl"><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>${table().map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td><div>${crest(CLUBS[r.id], 18)}${esc(r.name)}</div></td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table>`;
+  return `<div class="tblwrap"><table class="tbl"><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>${table().map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td><div>${crest(ALL[r.id], 18)}${esc(r.name)}</div></td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table></div>`;
 }
 function prematch() {
   window.scrollTo(0, 0);
@@ -249,17 +337,18 @@ function prematch() {
   planP = call({ action: 'plan', manager: fx.opp, report }).then((p) => (plan = { ...p, report })).catch(() => (plan = { ...FALLBACK, report, fallback: true }));
   const steps = state.md === 0 ? ['is reading the scouting report…', 'is checking your squad…', 'is picking a team to beat you…'] : ['is watching your last match…', 'has spotted how you attack…', 'is picking a team to beat you…'];
   let si = 0; const iv = setInterval(() => { const s = $('#oppstatus'); if (!s || plan) return clearInterval(iv); si = Math.min(si + 1, steps.length - 1); s.innerHTML = `<span class="pulse"></span>${last} ${steps[si]}`; }, 2600);
-  planP.then(() => { const s = $('#oppstatus'); if (s) s.innerHTML = `<span class="pulse ok"></span>Team sheet is in. You'll see it at kick-off.`; });
+  planP.then(() => { const s = $('#oppstatus'); if (s) s.innerHTML = MG.style === 'tactician' ? `<span class="pulse ok"></span>Your analysts: expect ${plan.formation}, ${plan.press.toLowerCase()} press.` : `<span class="pulse ok"></span>Team sheet is in. You'll see it at kick-off.`; });
   const seg = (key, opts) => `<div class="seg" data-k="${key}">${opts.map((o) => `<button class="${t[key] === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div>`;
   const threats = [...opp.squad].sort((a, b) => b.att - a.att).slice(0, 4);
   if (t.mark !== 'None' && !threats.some((p) => p.name === t.mark)) t.mark = 'None';
   app.innerHTML = topbar() + `<div class="wrap">
     <section class="fixture"><div class="fin">
       <div class="side">${crest(CLUBS.you, 58)}<div><h2>Ashford Town</h2><span>YOU · ${fx.home ? 'HOME' : 'AWAY'}</span></div></div>
-      <div class="vs"><span>MATCHDAY ${state.md + 1} OF 3</span><b>VS</b></div>
+      <div class="vs"><span>MATCHDAY ${state.md + 36} OF 38</span><b>VS</b></div>
       <div class="side r"><div><h2>${opp.name}</h2><span>${opp.tag.toUpperCase()}</span></div>${crest(opp, 58)}</div>
       <div class="boss"><img src="${IMG[fx.opp]}" alt=""><div><b>${opp.manager}</b><em>${opp.line}</em><div class="status" id="oppstatus"><span class="pulse"></span>${last} ${steps[0]}</div></div></div>
     </div></section>
+    <div class="strip"><b>THE RUN-IN</b><span>${BLURB[state.md]} You are ${ord(table().findIndex((r) => r.id === 'you') + 1)}, ${table()[0].pts - table().find((r) => r.id === 'you').pts} point${table()[0].pts - table().find((r) => r.id === 'you').pts === 1 ? '' : 's'} off the top with ${3 - state.md} to play.</span></div>
     <div class="hub">
       <div class="tile"><div class="th">Tactics board <span class="mono" id="fl" style="font-size:12px;color:var(--lime)"></span></div><canvas id="pc"></canvas></div>
       <div class="tile"><div class="th">Team instructions</div><div class="tb tg">
@@ -275,7 +364,9 @@ function prematch() {
         <div class="tile"><div class="th">League table</div><div class="tb" style="padding:8px 14px">${tableHtml()}</div></div>
         <div class="tile"><div class="th">Their dangermen</div><div class="tb" style="padding:8px 16px">${threats.map((p) => `<div class="row"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><div class="bar" style="max-width:90px"><i style="width:${p.att}%"></i></div><span class="pill">${p.att}</span></div>`).join('')}</div></div>
       </div>
-    </div></div>`;
+    </div>
+    <div class="tile" style="margin-top:18px"><div class="th">Your squad <span class="mono" style="font-size:11px">TAP A PLAYER FOR HIS STORY</span></div><div class="tb"><div class="squad" id="squad"></div></div></div>
+    </div>`;
   bindTop();
   app.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); drawBoard(); })));
   $('#mark').onchange = (e) => (t.mark = e.target.value);
@@ -314,6 +405,8 @@ function drawBoard() {
     rr(g, x - w / 2, yy + 22, w, 18, 6); g.fill(); g.fillStyle = '#fff'; g.textBaseline = 'middle'; g.fillText(sur(p.name), x, yy + 31.5);
     g.fillStyle = p.morale >= 8 ? '#3D5BFF' : p.morale >= 6 ? '#DDE5DA' : '#FF5A4E'; g.beginPath(); g.arc(x + 20, yy - 16, 4.5, 0, 7); g.fill();
   }
+  const names = xi.map((p) => p.name), sqd = [...CLUBS.you.squad].sort((a, b) => names.includes(b.name) - names.includes(a.name) || b.ovr - a.ovr);
+  const sqEl = $('#squad'); if (sqEl) { sqEl.innerHTML = sqd.map((p, n) => `<button class="pc ${names.includes(p.name) ? 'in' : ''}" data-n="${n}"><div class="ph" style="${faceCss(p)}"></div><span class="ov">${p.ovr}</span><span class="ps">${p.pos}</span><b>${esc(p.name)}</b><span class="t">${p.age} · ${p.trait}</span></button>`).join(''); sqEl.querySelectorAll('.pc').forEach((b) => (b.onclick = () => playerModal(sqd[+b.dataset.n]))); }
   $('#fl').textContent = t.formation;
   $('#hint').textContent = HINTS.press[t.press] + ' ' + HINTS.mentality[t.mentality];
 }
@@ -395,7 +488,7 @@ function hud() {
   const row = (lab, a, b, fa, fb) => { const t = fa + fb || 1; return `<div class="st"><em>${lab}</em><span>${a}</span><div class="split"><i style="width:${(fa / t) * 100}%;background:${hc}"></i><i style="flex:1;background:${ac}"></i></div><span style="text-align:right">${b}</span></div>`; };
   $('#stats').innerHTML = row('POSSESSION', ph + '%', 100 - ph + '%', ph, 100 - ph) + row('SHOTS', M.shots[0], M.shots[1], M.shots[0] || 0.5, M.shots[1] || 0.5) + row('EXPECTED GOALS', M.xg[0].toFixed(2), M.xg[1].toFixed(2), M.xg[0] || 0.05, M.xg[1] || 0.05);
   const me = [M.home, M.away][M.meIdx], pf = me.t.press === 'High' ? 1.35 : me.t.press === 'Low' ? 0.8 : 1;
-  $('#xi').innerHTML = me.xi.map((p, i) => { const cond = clamp(Math.round(100 - M.min * (1.3 - p.sta / 100) * 0.62 * pf), 30, 100), r = rat(p); return `<div class="row"><span class="pos">${i + 1}</span><span class="nm">${esc(sur(p.name))}</span><div class="bar" style="max-width:54px"><i style="width:${cond}%;background:${cond > 75 ? '#121316' : cond > 55 ? '#E69A00' : '#E5341D'}"></i></div><span class="pill ${ratCls(r)}">${r.toFixed(1)}</span></div>`; }).join('');
+  $('#xi').innerHTML = me.xi.map((p, i) => { const cond = clamp(Math.round(100 - M.min * (1.3 - p.sta / 100) * 0.62 * pf), 30, 100), r = rat(p); return `<div class="row" style="padding:5px 0">${face(p, 28)}<span class="nm">${esc(sur(p.name))}</span><div class="bar" style="max-width:50px"><i style="width:${cond}%;background:${cond > 75 ? '#121316' : cond > 55 ? '#E69A00' : '#E5341D'}"></i></div><span class="pill ${ratCls(r)}">${r.toFixed(1)}</span></div>`; }).join('');
   const sc = (side) => M.scorers.filter((s) => s.side === side).map((s) => `${sur(s.name)} ${s.min}'`).join(', ');
   $('#sc0').textContent = sc(0); $('#sc1').textContent = sc(1);
   drawMom();
@@ -484,7 +577,7 @@ function halftime() {
   const lead = M.score[M.meIdx] - M.score[oppIdx];
   const sit = `${M.home.club.name} ${M.score[0]} - ${M.score[1]} ${M.away.club.name} at half-time. Ashford ${lead > 0 ? 'are winning' : lead < 0 ? 'are losing' : 'are level'}. Shots ${M.shots[M.meIdx]}-${M.shots[oppIdx]}.`;
   const seg = (k, opts) => `<div class="seg" data-k="${k}">${opts.map((o) => `<button class="${me.t[k] === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div>`;
-  const roomHtml = (eff) => me.xi.map((p) => { const e = (eff || []).find((x) => x.name === p.name), r = rat(p); return `<div class="pr"><div class="l1"><b>${esc(p.name)}</b>${e ? `<span class="delta ${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span>` : ''}<span class="pill ${ratCls(r)}">${r.toFixed(1)}</span><span class="pill ${morCls(p.morale)}" title="Morale">M ${p.morale}</span></div><div class="tr">${p.slot} · ${p.age} · ${p.trait}</div>${e ? `<div class="why">${esc(e.reason)}</div>` : ''}</div>`; }).join('');
+  const roomHtml = (eff) => me.xi.map((p) => { const e = (eff || []).find((x) => x.name === p.name), r = rat(p); return `<div class="pr"><div class="l1">${face(p, 34)}<b>${esc(p.name)}</b>${e ? `<span class="delta ${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span>` : ''}<span class="pill ${ratCls(r)}">${r.toFixed(1)}</span><span class="pill ${morCls(p.morale)}" title="Morale">M ${p.morale}</span></div><div class="tr">${p.slot} · ${p.age} · ${p.trait}</div>${e ? `<div class="why">${esc(e.reason)}</div>` : ''}</div>`; }).join('');
   const ov = document.createElement('div'); ov.className = 'overlay';
   ov.innerHTML = `<div class="obg" style="background-image:url(/img/dressing.jpg)"></div><div class="modal">
     <div class="mh"><div><div class="small mono">HALF-TIME · ${M.home.club.short} ${M.score[0]}–${M.score[1]} ${M.away.club.short}</div><div class="cond" style="font-size:32px;font-weight:800;line-height:1.1">The dressing room</div></div>
@@ -537,7 +630,7 @@ function fulltime() {
   const fx = FIXTURES[state.md], me = M.meIdx, op = M.oppIdx, opp = CLUBS[M.oppId], first = opp.manager.split(' ')[0];
   state.results.push([M.home.club.id, M.away.club.id, M.score[0], M.score[1]]);
   const [o1, o2] = fx.other, os = quickSim(o1, o2, 900 + state.md);
-  state.results.push([o1, o2, os[0], os[1]]);
+  state.results.push([o1, o2, os[0], os[1]]); simOthers(state.md).forEach((x) => state.results.push(x));
   const L = M.lanes[me], lt = L.Left + L.Centre + L.Right || 1, myT = [M.home, M.away][me].t, tot = M.poss[0] + M.poss[1] || 1;
   state.history.push({ opp: opp.name, score: [M.score[me], M.score[op]], t: { ...myT }, lanePct: `Their attacks went ${Math.round((L.Left / lt) * 100)}% left, ${Math.round((L.Centre / lt) * 100)}% centre, ${Math.round((L.Right / lt) * 100)}% right`, poss: Math.round((M.poss[me] / tot) * 100), shots: M.shots[me], xg: M.xg[me].toFixed(2) });
   Object.assign(state.tactics, { mentality: myT.mentality, press: myT.press, attack_lane: myT.attack_lane });
@@ -549,7 +642,7 @@ function fulltime() {
   const sc = (side) => M.scorers.filter((s) => s.side === side).map((s) => `${esc(sur(s.name))} ${s.min}'`).join(', ');
   const strow = (lab, a, b) => `<div class="row"><span class="pill" style="min-width:52px">${a}</span><span class="nm" style="text-align:center;color:var(--mute);font:600 11px 'JetBrains Mono';letter-spacing:.08em">${lab}</span><span class="pill" style="min-width:52px">${b}</span></div>`;
   app.innerHTML = topbar() + `<div class="wrap">
-    <section class="hero"><div class="hin"><span class="res" style="${rc}">FULL-TIME · ${res}</span>
+    <section class="hero"><div class="hin"><span class="res" style="${rc}">FULL-TIME · ${res}</span><div class="paper">THE MORNING PAPERS</div><div class="headline">${res === 'WIN' ? (M.score[me] - M.score[op] >= 2 ? `Ashford tear ${esc(opp.name)} apart` : `${esc(MG.name)} outwits ${esc(opp.manager.split(' ')[1])}`) : res === 'DRAW' ? `Honours even as title race tightens` : `${esc(opp.manager.split(' ')[1])} reads ${esc(MG.name)} like a book`}</div>
       <div class="ft">${crest(M.home.club, 64)}<div style="text-align:right"><h2>${M.home.club.name}</h2><div class="small">${sc(0)}</div></div><div class="n ftscore">${M.score[0]}–${M.score[1]}</div><div style="text-align:left"><h2>${M.away.club.name}</h2><div class="small">${sc(1)}</div></div>${crest(M.away.club, 64)}</div>
       <div class="small" style="margin-top:8px">Elsewhere: ${CLUBS[o1].name} ${os[0]}–${os[1]} ${CLUBS[o2].name}</div></div></section>
     <div class="end">
@@ -571,9 +664,9 @@ function fulltime() {
 function season() {
   window.scrollTo(0, 0);
   const t = table(), pos = t.findIndex((r) => r.id === 'you') + 1;
-  const img = pos === 1 ? 'champions' : pos === 2 ? 'tunnel' : 'sacked';
+  const img = pos === 1 ? 'champions' : pos === 2 ? 'tunnel' : 'sacked', who = esc(MG.name);
   const head = pos === 1 ? 'Champions.' : pos === 2 ? 'So close.' : 'Sacked.';
-  const msg = pos === 1 ? 'Three managers studied you, countered you and changed things at half-time. None of them could stop you.' : pos === 2 ? 'Second place. The board wanted the title, and one of those managers read you a little too well.' : `You finished ${ord(pos)}. The board has seen enough, and your office has been cleared.`;
+  const msg = pos === 1 ? `Ashford Town are champions for the first time in 61 years. Three managers studied ${who}, countered and changed things at half-time. None of them could stop it.` : pos === 2 ? `Second, by a whisker. The chairman wanted the title, and one of those managers read ${who} a little too well.` : `Ashford finish ${ord(pos)}. Mr Halloran has thanked ${who} for the effort and cleared the office.`;
   const share = encodeURIComponent(`I finished ${ord(pos)} in Touchline, a football manager where every rival manager thinks for itself on @openservai SERV Reasoning. Can you win the league? ${location.origin}`);
   app.innerHTML = topbar() + `<section class="season" style="background-image:url(/img/${img}.jpg)"><div class="in">
     <div class="cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:8px">Final standings · ${ord(pos)} place</div>

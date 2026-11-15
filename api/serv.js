@@ -135,6 +135,17 @@ module.exports = async (req, res) => {
       return res.json({ ...out.data, meta: out.meta });
     }
 
+    if (b.action === 'bios') {
+      const ps = (b.players || []).slice(0, 18), names = ps.map((p) => String(p.name).slice(0, 40));
+      const out = await serv(
+        'You write short player backstories for a football management game. The club is Ashford Town, fourth in the league with three games left and three points off the top. For each player write two sentences in plain, dry English: where he came from and one specific human detail that fits his personality trait and age. No cliches, no superlatives, no real clubs or real people. Every player must be different.',
+        ps.map((p) => `- ${p.name} (${p.pos}, age ${p.age}, ${p.trait})`).join('\n'),
+        { name: 'bios', schema: { type: 'object', properties: { bios: { type: 'array', items: { type: 'object', properties: { name: { type: 'string', enum: names }, story: { type: 'string' } }, required: ['name', 'story'], additionalProperties: false } } }, required: ['bios'], additionalProperties: false } },
+      );
+      if (out.blocked || !out.data?.bios) return res.status(502).json({ error: 'No stories' });
+      return res.json({ bios: out.data.bios, meta: out.meta });
+    }
+
     res.status(400).json({ error: 'Unknown action' });
   } catch (e) {
     console.error(e);

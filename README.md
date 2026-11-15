@@ -5,7 +5,7 @@ Built for the OpenServ SERV Hackathon, Edition 02 (Open Track).
 
 Play: **https://touchline.nerom.site**
 
-You take over Ashford Town with three matches to win a four-club league. Each opponent is run by a manager on **SERV Reasoning**:
+You take over Ashford Town for the last three matchdays of a 20-club season. You are fourth, three points off the top, and the three clubs above you are the three you still have to play. You pick what kind of manager you are (Motivator, Tactician or Sergeant, each with a perk), and every player in your squad has a face and a backstory written by SERV. Each opponent is run by a manager on **SERV Reasoning**:
 
 - **Teodor Blank** (Harrow Vale), pragmatic and hard to break down
 - **Marisol Ortega** (Port Arden), a high-press coach who chases games
@@ -27,10 +27,11 @@ You take over Ashford Town with three matches to win a four-club league. Each op
 |---|---|---|
 | `plan` | before each match | strict `json_schema` (enum formations, mentality, press, lanes), reasoning notes |
 | `halftime` | at the break | same schema, reading live stats |
+| `bios` | when you take the job | one call writes a two-sentence backstory for all 17 squad players (player-name enum) |
 | `talk` | at the break | schema built per request (player-name enum, morale-change enum), **Prompt Guard** tool |
 
 - Model: `gpt-6-luna` via `inference-api.openserv.ai/v1/chat/completions`
-- Measured on the live site: a full 3-match season is **9 SERV decisions for about $0.005** (around $0.0005 a decision), about 8s average, and a cheat talk is blocked in about 1.5s.
+- Measured on the live site: a full run-in is **10 SERV calls for about $0.0055** (around $0.0005 a decision), about 8s average, and a cheat talk is blocked in about 1.5s.
 - The live cost and time ledger sits in the top bar while you play.
 
 ## Code

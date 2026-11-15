@@ -16,6 +16,20 @@ const TRAITS = ['Leader', 'Hothead', 'Nervous youngster', 'Veteran', 'Flair play
 const FIRST = ['Luca', 'Mateo', 'Jonas', 'Arlo', 'Kai', 'Theo', 'Rafa', 'Nils', 'Owen', 'Elias', 'Sami', 'Ivo', 'Leon', 'Milo', 'Hugo', 'Tomas', 'Felix', 'Remy', 'Ezra', 'Bram', 'Caio', 'Dario', 'Emil', 'Finn'];
 const LAST = ['Varga', 'Holt', 'Brennan', 'Okafor', 'Lindqvist', 'Moreau', 'Kovac', 'Seidel', 'Duarte', 'Hayes', 'Novak', 'Castell', 'Reyes', 'Falk', 'Ibsen', 'Marchetti', 'Quinn', 'Sato', 'Vidal', 'Wren', 'Abara', 'Bakker', 'Costa', 'Dunn'];
 
+const STORY_T = {
+  'Leader': 'Wore the armband for the under-18s and never really took it off. The room goes quiet when he talks.',
+  'Hothead': 'Sent off twice last season and loved by the fans for it. Plays best when someone has annoyed him.',
+  'Nervous youngster': 'Still gets the bus to training. Brilliant on a Tuesday, pale on a matchday.',
+  'Veteran': 'Has seen four managers come and go. Knows exactly how much running a game really needs.',
+  'Flair player': 'Tries things nobody asked for. Half of them end up on the highlights, half in the stand.',
+  'Workhorse': 'Covers more ground than anyone in the league and has never once complained about it.',
+  'Quiet professional': 'First in, last out, says about nine words a week. Coaches adore him.',
+  'Joker': 'Runs the dressing-room playlist and the fines list. Keeps the squad loose when the table gets tight.',
+};
+function fallbackStory(q, r) {
+  const a = q.age <= 20 ? 'Came through the Ashford academy.' : q.age >= 30 ? 'On his last contract and wants one medal before he goes.' : r() < 0.5 ? 'Signed from the lower leagues three years ago.' : 'A local lad who grew up ten minutes from the ground.';
+  return `${a} ${STORY_T[q.trait]}`;
+}
 function makeSquad(seed, bias) {
   const r = rng(seed), used = new Set(), out = [];
   const name = () => { let n; do n = `${FIRST[Math.floor(r() * FIRST.length)]} ${LAST[Math.floor(r() * LAST.length)]}`; while (used.has(n)); used.add(n); return n; };
@@ -30,6 +44,7 @@ function makeSquad(seed, bias) {
       sta: Math.min(95, 60 + Math.floor(r() * 30) + (bias.sta || 0)), morale: 6 + Math.floor(r() * 3), side: ['Left', 'Centre', 'Right'][i % 3],
       goals: 0,
     });
+    const q = out[out.length - 1]; if (q.trait === 'Nervous youngster') q.age = 18 + (q.age % 3); if (q.trait === 'Veteran' && q.age < 30) q.age = 30 + (q.age % 4); q.ovr = Math.round(pos === 'FW' ? q.att : pos === 'MF' ? (q.att + q.def) / 2 + 6 : q.def); q.face = out.length - 1; q.story = fallbackStory(q, r);
   }
   return out;
 }
@@ -40,6 +55,15 @@ const CLUBS = {
   ortega: { id: 'ortega', name: 'Port Arden', short: 'PAR', color: '#E0362C', ink: '#fff', manager: 'Marisol Ortega', tag: 'Heavy Metal', line: 'Presses like her life depends on it. Takes risks, chases every game.', squad: makeSquad(37, { sta: 8, att: 2 }) },
   ferrier: { id: 'ferrier', name: 'Kingsmere', short: 'KIN', color: '#E6B325', ink: '#111', manager: 'Duncan Ferrier', tag: 'The Professor', line: 'Studies your habits, then changes shape to punish them.', squad: makeSquad(51, { att: 3, def: 3 }) },
 };
+const OTHERS = [['Calder Rovers', 62, '#7A3FF2'], ['Westmoor United', 60, '#0E8F6E'], ['Thornbury City', 58, '#F26B21'], ['Saltwick Athletic', 55, '#15181D'], ['Dunmere', 53, '#C2185B'], ['Brackley Wanderers', 51, '#1E63D6'], ['Lowfield Town', 49, '#8A5A2B'], ['Hartsea Albion', 47, '#0FA3B1'], ['Northgate', 46, '#5B6470'], ['Ravenscar', 44, '#3B1F6B'], ['Millbrook County', 42, '#B8860B'], ['Eastleigh Park', 40, '#D7263D'], ['Corran Borough', 37, '#2E7D32'], ['Stoneham', 33, '#455A64'], ['Whitby Marsh', 29, '#6D4C41'], ['Aldercross', 24, '#9E9D24']]
+  .map(([name, pts, color], i) => ({ id: 'o' + i, name, short: name.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase(), color, ink: '#fff', base: pts }));
+const BASEPTS = { blank: 74, ortega: 73, ferrier: 72, you: 71 };
+const ALL = {}; Object.values(CLUBS).forEach((c) => { c.base = BASEPTS[c.id]; ALL[c.id] = c; }); OTHERS.forEach((c) => (ALL[c.id] = c));
+function simOthers(md) {
+  const r = rng(4000 + md * 31), ids = OTHERS.map((c) => c.id), rot = ids.slice(md * 3).concat(ids.slice(0, md * 3)), out = [];
+  for (let i = 0; i < rot.length; i += 2) out.push([rot[i], rot[i + 1], Math.floor(r() * 3.3), Math.floor(r() * 2.8)]);
+  return out;
+}
 const FIXTURES = [
   { opp: 'blank', home: true, other: ['ortega', 'ferrier'] },
   { opp: 'ortega', home: false, other: ['blank', 'ferrier'] },
@@ -144,9 +168,9 @@ function scoutReport(oppId, md) {
   const xi = pickXI(me.squad, state.tactics.formation);
   const top = [...me.squad].sort((a, b) => b.goals - a.goals || b.att - a.att).slice(0, 3);
   const lanes = ['Left', 'Centre', 'Right'].map((l) => ({ l, d: avg(xi.filter((p) => p.slot === 'DF' && p.side === l).map((p) => p.def)) || 0 })).filter((x) => x.d).sort((a, b) => a.d - b.d);
-  const stand = table().map((t, i) => `${i + 1}. ${t.name} ${t.pts} pts (GD ${t.gd >= 0 ? '+' : ''}${t.gd})`).join('; ');
+  const stand = table().slice(0, 5).map((t, i) => `${i + 1}. ${t.name} ${t.pts} pts (GD ${t.gd >= 0 ? '+' : ''}${t.gd})`).join('; ');
   const lines = [
-    `MATCHDAY ${md + 1} of 3. You are ${CLUBS[oppId].name}. Opponent: Ashford Town (${FIXTURES[md].home ? 'they are at home' : 'you are at home'}).`,
+    `MATCHDAY ${md + 36} of 38, the title run-in. You are ${CLUBS[oppId].name}. Opponent: Ashford Town (${FIXTURES[md].home ? 'they are at home' : 'you are at home'}).`,
     `LEAGUE TABLE: ${stand}.`,
     last
       ? `ASHFORD'S LAST MATCH: ${last.score[0]}-${last.score[1]} vs ${last.opp}. They played ${last.t.formation}, ${last.t.mentality}, ${last.t.press} press, attacking mostly down the ${last.t.attack_lane}. ${last.lanePct}. Possession ${last.poss}%. Shots ${last.shots}, xG ${last.xg}.`
@@ -175,7 +199,7 @@ function halftimeReport(m, oppIdx) {
 // ---------- state ----------
 const state = { md: 0, tactics: { formation: '4-3-3', mentality: 'Balanced', press: 'Mid', attack_lane: 'Centre', mark: 'None' }, history: [], results: [], notes: [] };
 function table() {
-  const t = Object.values(CLUBS).map((c) => ({ id: c.id, name: c.name, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0 }));
+  const t = Object.values(ALL).map((c) => { const d = 8 + ((c.base - 8) % 3), w = (c.base - d) / 3, gd = Math.round((c.base - 48) * 1.1), gf = 40 + Math.round((c.base - 24) * 0.6); return { id: c.id, name: c.name, p: 35, w, d, l: 35 - w - d, gf, ga: gf - gd, gd, pts: c.base }; });
   const get = (id) => t.find((x) => x.id === id);
   for (const [h, a, sh, sa] of state.results) {
     const H = get(h), A = get(a); H.p++; A.p++; H.gf += sh; H.ga += sa; A.gf += sa; A.ga += sh;
