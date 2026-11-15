@@ -224,7 +224,7 @@ const rat = (p) => clamp(p.rating || 6.5, 4, 10);
 
 const LOGO = { you: 1, blank: 1, ortega: 1, ferrier: 1 };
 function crest(c, s = 44) {
-  if (LOGO[c.id]) return `<img src="/img/crest-${c.id}.jpg" alt="" width="${s}" height="${s}" style="width:${s}px;height:${s}px;border-radius:24%;flex:none;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.28)">`;
+  if (LOGO[c.id] || /^o\d+$/.test(c.id)) return `<img src="/img/crest-${c.id}.jpg" alt="" width="${s}" height="${s}" style="width:${s}px;height:${s}px;border-radius:24%;flex:none;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.28)">`;
   return `<span style="width:${s}px;height:${s}px;border-radius:24%;flex:none;display:inline-grid;place-items:center;background:${c.color};color:#fff;font:800 ${Math.round(s * 0.42)}px 'Barlow Condensed';letter-spacing:.02em">${c.short.slice(0, s < 30 ? 1 : 3)}</span>`;
 }
 function faceCss(p) { const i = p.face || 0, k = i % 9, S = 3.5, pos = (c) => (((c * S - 0.5) / (S - 1)) * 100).toFixed(1); return `background-image:url(/img/faces${i < 9 ? 1 : 2}.jpg);background-size:${S * 100}%;background-position:${pos(((k % 3) + 0.5) / 3)}% ${pos((Math.floor(k / 3) + 0.45) / 3)}%`; }
