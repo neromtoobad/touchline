@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Touchline</title>
+<meta name="description" content="A football management game where every rival manager thinks for itself. Three matches, three managers on SERV Reasoning who scout you, counter you and change shape at half-time.">
+<meta property="og:title" content="Touchline: out-think three AI managers">
+<meta property="og:description" content="Every rival manager scouts you, picks a counter-plan and adapts at half-time, on SERV Reasoning.">
+<meta property="og:image" content="/img/tunnel.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230B0E0C%22/%3E%3Cpath d=%22M6 22h20%22 stroke=%22%23C6F432%22 stroke-width=%224%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0E0C;--panel:#131815;--panel2:#1A201C;--line:#26302A;--ink:#EEF2EC;--mute:#8C978F;--lime:#C6F432;--red:#FF5A4E;--amber:#F2B53A;--blue:#6EA8FF}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.cond{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.02em}
+.mono{font-family:'JetBrains Mono',monospace}
+#app{min-height:100vh}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,12,.92);backdrop-filter:blur(8px);z-index:5}
+.brand{font:800 24px 'Barlow Condensed';letter-spacing:.06em}
+.brand i{color:var(--lime);font-style:normal}
+.ledger{font:12px 'JetBrains Mono';color:var(--mute);display:flex;gap:16px}
+.ledger b{color:var(--ink);font-weight:600}
+.wrap{max-width:1240px;margin:0 auto;padding:22px}
+/* title */
+.title{position:relative;min-height:100vh;display:flex;align-items:flex-end;background:url(/img/tunnel.jpg) center/cover}
+.title:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,14,12,.1) 0%,rgba(11,14,12,.35) 45%,rgba(11,14,12,.97) 100%)}
+.title .in{position:relative;padding:48px;max-width:860px}
+.title h1{font:800 clamp(64px,11vw,148px)/.86 'Barlow Condensed';letter-spacing:.01em;text-transform:uppercase}
+.title h1 i{color:var(--lime);font-style:normal}
+.title p{font-size:19px;line-height:1.5;color:#D5DBD3;margin:16px 0 26px;max-width:620px}
+.mgrs{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap}
+.mgr{display:flex;align-items:center;gap:10px;background:rgba(19,24,21,.75);border:1px solid var(--line);border-radius:14px;padding:8px 14px 8px 8px}
+.mgr img{width:44px;height:44px;border-radius:10px;object-fit:cover}
+.mgr b{display:block;font-size:14px}.mgr span{font-size:12px;color:var(--mute)}
+.btn{appearance:none;border:0;background:var(--lime);color:#0B0E0C;font:700 20px 'Barlow Condensed';letter-spacing:.06em;text-transform:uppercase;padding:14px 28px;border-radius:12px;cursor:pointer;transition:transform .12s,opacity .12s}
+.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.35;cursor:default;transform:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+/* panels */
+.grid{display:grid;grid-template-columns:320px 1fr 300px;gap:18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.ph{padding:14px 16px;border-bottom:1px solid var(--line);font:700 15px 'Barlow Condensed';letter-spacing:.08em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
+.pb{padding:16px}
+.opp img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.opp .who{padding:16px}
+.opp h3{font:800 30px/1 'Barlow Condensed';text-transform:uppercase}
+.tagl{display:inline-block;font:600 12px 'JetBrains Mono';color:var(--lime);margin:6px 0 10px}
+.small{font-size:13.5px;color:var(--mute);line-height:1.5}
+.status{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mute)}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:p 1s infinite}
+.pulse.ok{background:var(--lime);animation:none}
+@keyframes p{50%{opacity:.25}}
+.tg{display:grid;gap:14px}
+.tg label{font:600 12px 'JetBrains Mono';color:var(--mute);display:block;margin-bottom:7px;letter-spacing:.04em}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:600 14px Inter;cursor:pointer}
+.seg button.on{background:var(--lime);color:#0B0E0C;border-color:var(--lime)}
+select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font:600 14px Inter;width:100%}
+.pitch{position:relative;border-radius:14px;overflow:hidden;background:#123321}
+canvas{display:block;width:100%;height:auto}
+.xi{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 14px;margin-top:12px}
+.pl{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)}
+.pl .pos{font:600 11px 'JetBrains Mono';color:var(--mute);width:26px}
+.pl .nm{flex:1}
+.mor{font:600 11px 'JetBrains Mono';padding:2px 6px;border-radius:5px}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl td,.tbl th{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
+.tbl th{font:600 11px 'JetBrains Mono';color:var(--mute)}
+.tbl td:nth-child(2),.tbl th:nth-child(2){text-align:left}
+.tbl tr.me td{color:var(--lime);font-weight:600}
+/* match */
+.score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:18px 22px}
+.team{display:flex;align-items:center;gap:12px;font:800 28px 'Barlow Condensed';text-transform:uppercase}
+.team.r{justify-content:flex-end}
+.kit{width:14px;height:34px;border-radius:4px}
+.big{font:800 60px/1 'Barlow Condensed';display:flex;gap:16px;align-items:center}
+.clock{font:600 14px 'JetBrains Mono';color:var(--lime);text-align:center;margin-top:4px}
+.mrow{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+.feed{height:420px;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.ev{font-size:14px;line-height:1.45;display:grid;grid-template-columns:38px 1fr;gap:8px}
+.ev .m{font:600 12px 'JetBrains Mono';color:var(--mute);padding-top:2px}
+.ev.goal{color:var(--lime);font-weight:700}
+.ev.serv{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;color:#DDE5DA}
+.stats{display:grid;gap:10px;padding:16px}
+.srow{display:grid;grid-template-columns:44px 1fr 44px;gap:10px;align-items:center;font:600 13px 'JetBrains Mono'}
+.srow .bar{height:6px;border-radius:3px;background:var(--panel2);position:relative;overflow:hidden}
+.srow .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
+.srow .lab{grid-column:1/-1;font:600 11px 'JetBrains Mono';color:var(--mute);text-align:center;margin-bottom:-6px}
+.ttag{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 14px}
+.chip{font:600 12px 'JetBrains Mono';background:var(--panel2);border:1px solid var(--line);padding:5px 8px;border-radius:7px}
+.chip.l{border-color:var(--lime);color:var(--lime)}
+/* half-time & notes */
+.notes{display:grid;gap:8px}
+.note{display:grid;grid-template-columns:22px 1fr;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;line-height:1.45}
+.note .n{font:600 12px 'JetBrains Mono';color:var(--lime)}
+.note .s{color:var(--mute)}
+.quote{font:600 20px/1.3 'Barlow Condensed';letter-spacing:.01em;border-left:3px solid var(--lime);padding-left:12px;margin:6px 0}
+textarea{width:100%;min-height:84px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:15px Inter;padding:12px;resize:vertical}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chips button{background:transparent;border:1px solid var(--line);border-radius:20px;padding:6px 11px;font-size:13px;cursor:pointer;color:var(--mute)}
+.chips button:hover{color:var(--ink);border-color:var(--ink)}
+.eff{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px solid var(--line)}
+.up{color:var(--lime);font-weight:700}.down{color:var(--red);font-weight:700}
+.overlay{position:fixed;inset:0;background:rgba(5,7,6,.78);display:grid;place-items:center;z-index:20;padding:16px}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;max-width:620px;width:100%;overflow:hidden}
+.modal .mh{display:flex;gap:14px;align-items:center;padding:18px;border-bottom:1px solid var(--line)}
+.modal .mh img{width:64px;height:64px;border-radius:12px;object-fit:cover}
+.end{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:1100px){.grid{grid-template-columns:1fr 1fr}.grid>.panel:last-child{grid-column:1/-1}}
+@media (max-width:760px){.grid,.mrow,.end{grid-template-columns:1fr}.title .in{padding:24px 16px}.wrap{padding:14px}.big{font-size:44px}.team{font-size:20px}.feed{height:300px}.ledger{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="/game.js"></script>
+<script>
+const app = $('#app');
+const IMG = { blank: '/img/blank.jpg', ortega: '/img/ortega.jpg', ferrier: '/img/ferrier.jpg' };
+const morCol = (m) => (m >= 8 ? 'background:#2B3B12;color:#C6F432' : m >= 6 ? 'background:#26302A;color:#DDE5DA' : 'background:#3B1A17;color:#FF8A80');
+
+function topbar() {
+  return `<div class="top"><div class="brand">TOUCH<i>LINE</i></div><div class="ledger">
+    <span>SERV calls <b>${ledger.calls}</b></span><span>spent <b>$${ledger.cost.toFixed(4)}</b></span><span>avg <b>${ledger.calls ? (ledger.ms / ledger.calls / 1000).toFixed(1) : '0.0'}s</b></span><span>blocked <b>${ledger.blocked}</b></span></div></div>`;
+}
+const refreshTop = () => { const t = $('.top'); if (t) t.outerHTML = topbar(); };
+
+// ---------- title ----------
+function title() {
+  app.innerHTML = `<section class="title"><div class="in">
+    <div class="small cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:10px">A football management game</div>
+    <h1>Out-think<br><i>the dugout.</i></h1>
+    <p>You've taken the Ashford Town job with three games to win the league. Every rival manager watches your last match, picks a plan to beat you and changes it at half-time. They think for themselves, and after each game you get to read their notes.</p>
+    <div class="mgrs">${['blank', 'ortega', 'ferrier'].map((id) => `<div class="mgr"><img src="${IMG[id]}" alt=""><div><b>${CLUBS[id].manager}</b><span>${CLUBS[id].name} · ${CLUBS[id].tag}</span></div></div>`).join('')}</div>
+    <button class="btn" id="go">Take the job</button>
+  </div></section>`;
+  $('#go').onclick = prematch;
+}
+
+// ---------- pre-match ----------
+let plan = null, planP = null;
+function prematch() {
+  const fx = FIXTURES[state.md], opp = CLUBS[fx.opp];
+  plan = null;
+  const report = scoutReport(fx.opp, state.md);
+  planP = serv({ action: 'plan', manager: fx.opp, report }).then((p) => (plan = { ...p, report })).catch(() => (plan = { ...FALLBACK, report, fallback: true }));
+  planP.then(() => { const s = $('#oppstatus'); if (s) s.innerHTML = `<span class="pulse ok"></span>${opp.manager} has named the team. You'll see it at kick-off.`; refreshTop(); });
+  const t = state.tactics;
+  const seg = (key, opts) => `<div class="seg" data-k="${key}">${opts.map((o) => `<button class="${t[key] === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div>`;
+  const oppThreats = [...opp.squad].sort((a, b) => b.att - a.att).slice(0, 3);
+  app.innerHTML = topbar() + `<div class="wrap"><div class="grid">
+    <div class="panel opp"><img src="${IMG[fx.opp]}" alt="">
+      <div class="who"><div class="small mono">MATCHDAY ${state.md + 1} OF 3 · ${fx.home ? 'HOME' : 'AWAY'}</div><h3>${opp.name}</h3><span class="tagl">${opp.manager} · ${opp.tag}</span><p class="small">${opp.line}</p></div>
+      <div class="status" id="oppstatus"><span class="pulse"></span>${opp.manager} is watching your last match…</div>
+    </div>
+    <div class="panel"><div class="ph">Your plan <span class="mono" style="font-size:12px">${CLUBS.you.name}</span></div><div class="pb tg">
+      <div class="pitch"><canvas id="pc" width="900" height="560"></canvas></div>
+      <div><label>FORMATION</label>${seg('formation', Object.keys(FORMS))}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label>MENTALITY</label>${seg('mentality', ['Defensive', 'Balanced', 'Attacking'])}</div>
+        <div><label>PRESS</label>${seg('press', ['Low', 'Mid', 'High'])}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label>ATTACK THROUGH</label>${seg('attack_lane', ['Left', 'Centre', 'Right'])}</div>
+        <div><label>MAN-MARK</label><select id="mark"><option value="None">Nobody</option>${oppThreats.map((p) => `<option ${t.mark === p.name ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div>
+      </div>
+      <div id="xi" class="xi"></div>
+      <button class="btn" id="ko">Kick off</button>
+    </div></div>
+    <div class="panel"><div class="ph">Table</div><div class="pb">${tableHtml()}</div>
+      <div class="ph" style="border-top:1px solid var(--line)">Their dangermen</div><div class="pb">${oppThreats.map((p) => `<div class="pl"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><span class="mono" style="font-size:12px">ATT ${p.att}</span></div>`).join('')}</div>
+    </div>
+  </div></div>`;
+  app.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); drawXI(); })));
+  $('#mark').onchange = (e) => (t.mark = e.target.value);
+  drawXI();
+  $('#ko').onclick = async () => {
+    if (!plan) { $('#ko').disabled = true; $('#ko').textContent = `Waiting for ${opp.manager}'s team sheet…`; await planP; }
+    play();
+  };
+}
+function drawXI() {
+  const xi = pickXI(CLUBS.you.squad, state.tactics.formation);
+  $('#xi').innerHTML = xi.map((p) => `<div class="pl"><span class="pos">${p.slot}</span><span class="nm">${esc(p.name)}</span><span class="mor" style="${morCol(p.morale)}">${p.morale}</span></div>`).join('');
+  const c = $('#pc'); if (c) drawPitch(c.getContext('2d'), { home: { xi, club: CLUBS.you, t: state.tactics } }, null, true);
+}
+function tableHtml() {
+  return `<table class="tbl"><tr><th>#</th><th>Club</th><th>P</th><th>GD</th><th>Pts</th></tr>${table().map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td>${r.pts}</td></tr>`).join('')}</table>`;
+}
+
+// ---------- pitch ----------
+function slots(xi, form, home) {
+  const f = FORMS[form], pos = [];
+  const lines = [['GK', 1, 0.04], ['DF', f.DF, 0.16], ['MF', f.MF, 0.29], ['FW', f.FW, 0.42]];
+  let k = 0;
+  for (const [, n, x] of lines) for (let i = 0; i < n; i++, k++) { const y = (i + 1) / (n + 1); pos.push({ x: home ? x : 1 - x, y, p: xi[k] }); }
+  return pos;
+}
+function drawPitch(g, teams, ball, solo) {
+  const W = g.canvas.width, H = g.canvas.height;
+  for (let i = 0; i < 10; i++) { g.fillStyle = i % 2 ? '#174A2E' : '#1A5233'; g.fillRect((W / 10) * i, 0, W / 10, H); }
+  g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2;
+  g.strokeRect(20, 20, W - 40, H - 40); g.beginPath(); g.moveTo(W / 2, 20); g.lineTo(W / 2, H - 20); g.stroke();
+  g.beginPath(); g.arc(W / 2, H / 2, 62, 0, 7); g.stroke();
+  g.strokeRect(20, H / 2 - 120, 110, 240); g.strokeRect(W - 130, H / 2 - 120, 110, 240);
+  g.strokeRect(20, H / 2 - 52, 40, 104); g.strokeRect(W - 60, H / 2 - 52, 40, 104);
+  const put = (side, color, ink, home) => {
+    if (!side) return;
+    for (const s of slots(side.xi, side.t.formation, home)) {
+      const x = 20 + s.x * (W - 40) * (solo ? 1.55 : 1) - (solo ? (W - 40) * 0.0 : 0), y = 20 + s.y * (H - 40);
+      const xx = solo ? 50 + (s.x / 0.42) * (W - 140) : x;
+      g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(xx + 2, y + 13, 13, 5, 0, 0, 7); g.fill();
+      g.fillStyle = color; g.beginPath(); g.arc(xx, y, 13, 0, 7); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,.4)'; g.lineWidth = 2; g.stroke();
+      if (solo || true) { g.fillStyle = '#fff'; g.font = '600 13px Inter'; g.textAlign = 'center'; g.fillText(s.p.name.split(' ')[1], xx, y + 30); }
+    }
+  };
+  put(teams.home, teams.home.club.color, teams.home.club.ink, true);
+  if (!solo) put(teams.away, teams.away.club.color, teams.away.club.ink, false);
+  if (ball) { g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(ball.x + 2, ball.y + 7, 7, 3, 0, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ball.x, ball.y, 7, 0, 7); g.fill(); }
+}
+
+// ---------- match ----------
+let M = null, talkRes = null, htPlan = null;
+async function play() {
+  const fx = FIXTURES[state.md], oppId = fx.opp;
+  const mine = { club: CLUBS.you, t: { ...state.tactics }, xi: pickXI(CLUBS.you.squad, state.tactics.formation) };
+  const theirs = { club: CLUBS[oppId], t: { formation: plan.formation, mentality: plan.mentality, press: plan.press, attack_lane: plan.attack_lane, mark: plan.mark }, xi: pickXI(CLUBS[oppId].squad, plan.formation) };
+  M = newMatch(fx.home ? mine : theirs, fx.home ? theirs : mine, 1000 + state.md * 77 + Date.now() % 1000);
+  M.meIdx = fx.home ? 0 : 1; M.oppIdx = 1 - M.meIdx; M.oppId = oppId; M.prePlan = plan;
+  app.innerHTML = topbar() + `<div class="wrap">
+    <div class="panel"><div class="score">
+      <div class="team"><span class="kit" style="background:${M.home.club.color}"></span>${M.home.club.name}</div>
+      <div><div class="big"><span id="s0">0</span><span style="color:var(--mute)">–</span><span id="s1">0</span></div><div class="clock" id="clk">0'</div></div>
+      <div class="team r">${M.away.club.name}<span class="kit" style="background:${M.away.club.color}"></span></div>
+    </div></div>
+    <div class="mrow" style="margin-top:18px">
+      <div class="panel"><div class="pitch" style="border-radius:0"><canvas id="mc" width="1000" height="620"></canvas></div>
+        <div class="stats" id="stats"></div></div>
+      <div class="panel"><div class="ph">Commentary</div><div class="feed" id="feed"></div></div>
+    </div></div>`;
+  feed({ min: 0, type: 'serv', html: servCard(CLUBS[oppId], plan, 'Pre-match plan', true) });
+  feed({ min: 0, text: `Kick-off. ${M.home.club.name} v ${M.away.club.name}.` });
+  await half(45);
+  halftime();
+}
+function servCard(club, p, label, hideNotes) {
+  return `<div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><img src="${IMG[club.id]}" style="width:34px;height:34px;border-radius:8px;object-fit:cover"><div><b>${club.manager}</b> <span class="small">· ${label}${p.fallback ? ' (offline)' : ''}</span></div></div>
+  <div class="chips" style="margin:4px 0 6px"><span class="chip l">${p.formation}</span><span class="chip">${p.mentality}</span><span class="chip">${p.press} press</span><span class="chip">Attack ${p.attack_lane}</span>${p.mark && p.mark !== 'None' ? `<span class="chip">Marking ${esc(p.mark)}</span>` : ''}</div>
+  <div class="quote">"${esc(p.quote)}"</div>${hideNotes ? '<div class="small">Their reasoning is shown at full-time.</div>' : ''}`;
+}
+function feed(e) {
+  const f = $('#feed'); if (!f) return;
+  const d = document.createElement('div'); d.className = `ev ${e.type || ''}`;
+  d.innerHTML = e.type === 'serv' ? e.html : `<span class="m">${e.min}'</span><span>${esc(e.text)}</span>`;
+  f.prepend(d);
+}
+let ballPos = { x: 500, y: 310 };
+function render(target) {
+  const c = $('#mc'); if (!c) return; const g = c.getContext('2d');
+  const step = () => { ballPos.x += (target.x - ballPos.x) * 0.18; ballPos.y += (target.y - ballPos.y) * 0.18; drawPitch(g, M, ballPos); };
+  for (let i = 0; i < 8; i++) setTimeout(step, i * 30);
+}
+function stats() {
+  const tot = M.poss[0] + M.poss[1] || 1, ph = Math.round((M.poss[0] / tot) * 100);
+  const row = (lab, a, b, fa, fb) => { const t = fa + fb || 1; return `<div class="srow"><span class="lab">${lab}</span><span>${a}</span><div class="bar"><i style="width:${(fa / t) * 100}%"></i></div><span style="text-align:right">${b}</span></div>`; };
+  $('#stats').innerHTML = row('POSSESSION', ph + '%', 100 - ph + '%', ph, 100 - ph) + row('SHOTS', M.shots[0], M.shots[1], M.shots[0], M.shots[1]) + row('xG', M.xg[0].toFixed(2), M.xg[1].toFixed(2), M.xg[0], M.xg[1]);
+}
+async function half(to) {
+  while (M.min < to) {
+    const evs = tick(M);
+    $('#clk').textContent = M.min + "'";
+    const att = M.poss[0] >= M.poss[1] ? 0 : 1;
+    let tgt = { x: 500 + (Math.random() - 0.5) * 300, y: 310 + (Math.random() - 0.5) * 300 };
+    for (const e of evs) {
+      const dir = e.side === 0 ? 1 : -1;
+      const laneY = { Left: 0.22, Centre: 0.5, Right: 0.78 }[e.lane];
+      const y = 20 + (e.side === 0 ? laneY : 1 - laneY) * 580;
+      tgt = { x: 500 + dir * 360, y };
+      feed({ min: M.min, text: e.text, type: e.type });
+      if (e.type === 'goal') { $('#s0').textContent = M.score[0]; $('#s1').textContent = M.score[1]; }
+    }
+    render(tgt); stats();
+    await sleep(evs.length ? 900 : 330);
+  }
+}
+
+// ---------- half-time ----------
+function halftime() {
+  feed({ min: 45, text: 'Half-time.' });
+  const oppIdx = M.oppIdx, opp = CLUBS[M.oppId];
+  htPlan = null; talkRes = null;
+  const htP = serv({ action: 'halftime', manager: M.oppId, report: halftimeReport(M, oppIdx) }).then((p) => (htPlan = p)).catch(() => (htPlan = null));
+  const me = [M.home, M.away][M.meIdx];
+  const sit = `${M.home.club.name} ${M.score[0]} - ${M.score[1]} ${M.away.club.name} at half-time. Ashford ${M.score[M.meIdx] > M.score[oppIdx] ? 'are winning' : M.score[M.meIdx] < M.score[oppIdx] ? 'are losing' : 'are level'}. Shots ${M.shots[M.meIdx]}-${M.shots[oppIdx]}.`;
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  ov.innerHTML = `<div class="modal"><div class="mh"><div><div class="small mono">HALF-TIME · ${M.score[0]}–${M.score[1]}</div><div class="cond" style="font-size:28px;font-weight:800">Dressing room</div></div></div>
+    <div class="pb tg">
+      <div><label>YOUR TEAM TALK</label><textarea id="talk" placeholder="Say it like you would in the room."></textarea>
+      <div class="chips">${['Keep doing this. Stay calm and trust the plan.', "That was not good enough. I want more from everyone.", 'Brilliant half. Proud of you. Go and finish it.', 'Forget the score. Win your own battle out there.'].map((t) => `<button>${t}</button>`).join('')}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label>MENTALITY</label><div class="seg" data-k="mentality">${['Defensive', 'Balanced', 'Attacking'].map((o) => `<button class="${me.t.mentality === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div></div>
+        <div><label>PRESS</label><div class="seg" data-k="press">${['Low', 'Mid', 'High'].map((o) => `<button class="${me.t.press === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div></div>
+      </div>
+      <div><label>ATTACK THROUGH</label><div class="seg" data-k="attack_lane">${['Left', 'Centre', 'Right'].map((o) => `<button class="${me.t.attack_lane === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div></div>
+      <div id="talkres"></div>
+      <button class="btn" id="out">Give the talk</button>
+      <div class="status" style="border:0;padding:0" id="htstat"><span class="pulse"></span>${opp.manager} is re-thinking in the away dressing room…</div>
+    </div></div>`;
+  document.body.appendChild(ov);
+  htP.then(() => { const s = $('#htstat'); if (s) s.innerHTML = `<span class="pulse ok"></span>${opp.manager} has made a decision.`; refreshTop(); });
+  ov.querySelectorAll('.chips button').forEach((b) => (b.onclick = () => ($('#talk').value = b.textContent)));
+  ov.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { me.t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); })));
+  let given = false;
+  $('#out').onclick = async () => {
+    if (!given) {
+      const text = $('#talk').value.trim() || 'Keep going, lads.';
+      $('#out').disabled = true; $('#out').textContent = 'The players are listening…';
+      try {
+        talkRes = await serv({ action: 'talk', text, situation: sit, players: me.xi.map((p) => ({ name: p.name, pos: p.slot, age: p.age, trait: p.trait, morale: p.morale, rating: (p.rating || 6.5).toFixed(1) })) });
+      } catch (e) { talkRes = { tone: 'Unclear', effects: [], room: 'The room is quiet.' }; }
+      for (const ef of talkRes.effects || []) {
+        const d = parseInt(ef.change, 10); const p = me.xi.find((x) => x.name === ef.name);
+        if (p) { p.morale = Math.max(1, Math.min(10, p.morale + d)); p.ref.morale = p.morale; }
+      }
+      $('#talkres').innerHTML = `<div class="small mono" style="margin-bottom:6px">TONE: ${esc(talkRes.tone).toUpperCase()}</div><p style="font-size:14.5px;line-height:1.5;margin-bottom:8px">${esc(talkRes.room)}</p>${(talkRes.effects || []).map((e) => `<div class="eff"><span><b>${esc(e.name)}</b> <span class="small">${esc(e.reason)}</span></span><span class="${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span></div>`).join('')}`;
+      refreshTop(); given = true; $('#out').disabled = false; $('#out').textContent = 'Second half';
+      return;
+    }
+    $('#out').disabled = true; $('#out').textContent = `Waiting for ${opp.manager}…`;
+    await htP;
+    ov.remove();
+    const them = [M.home, M.away][oppIdx];
+    if (htPlan) {
+      Object.assign(them.t, { formation: htPlan.formation, mentality: htPlan.mentality, press: htPlan.press, attack_lane: htPlan.attack_lane, mark: htPlan.mark });
+      const before = them.xi.map((p) => p.rating); them.xi = pickXI(them.club.squad, htPlan.formation); M.htPlan = htPlan;
+      feed({ min: 45, type: 'serv', html: servCard(opp, htPlan, 'Half-time change') + `<div class="notes" style="margin-top:8px">${htPlan.notes.map((n, i) => `<div class="note"><span class="n">${i + 1}</span><div><div class="s">${esc(n.saw)}</div>${esc(n.decided)}</div></div>`).join('')}</div>` });
+    }
+    feed({ min: 46, text: 'The second half is under way.' });
+    await half(90);
+    fulltime();
+  };
+}
+
+// ---------- full-time ----------
+function fulltime() {
+  const fx = FIXTURES[state.md], me = M.meIdx, op = M.oppIdx;
+  feed({ min: 90, text: `Full-time: ${M.home.club.name} ${M.score[0]}–${M.score[1]} ${M.away.club.name}.` });
+  state.results.push([M.home.club.id, M.away.club.id, M.score[0], M.score[1]]);
+  const [o1, o2] = fx.other; const os = quickSim(o1, o2, 900 + state.md);
+  state.results.push([o1, o2, os[0], os[1]]);
+  const L = M.lanes[me], lt = L.Left + L.Centre + L.Right || 1;
+  const myT = [M.home, M.away][me].t, tot = M.poss[0] + M.poss[1] || 1;
+  state.history.push({ opp: CLUBS[M.oppId].name, score: [M.score[me], M.score[op]], t: { ...myT }, lanePct: `Their attacks went ${Math.round((L.Left / lt) * 100)}% left, ${Math.round((L.Centre / lt) * 100)}% centre, ${Math.round((L.Right / lt) * 100)}% right`, poss: Math.round((M.poss[me] / tot) * 100), shots: M.shots[me], xg: M.xg[me].toFixed(2) });
+  const res = M.score[me] > M.score[op] ? 'WIN' : M.score[me] < M.score[op] ? 'LOSS' : 'DRAW';
+  const opp = CLUBS[M.oppId];
+  const notesHtml = (p, lab) => p ? `<div class="small mono" style="margin:10px 0 6px">${lab}</div><div class="notes">${p.notes.map((n, i) => `<div class="note"><span class="n">${i + 1}</span><div><div class="s">${esc(n.saw)}</div>${esc(n.decided)}</div></div>`).join('')}</div>` : '';
+  const last = state.md === FIXTURES.length - 1;
+  app.innerHTML = topbar() + `<div class="wrap"><div class="end">
+    <div class="panel"><div class="ph">Full-time <span class="mono" style="color:${res === 'WIN' ? 'var(--lime)' : res === 'LOSS' ? 'var(--red)' : 'var(--ink)'}">${res}</span></div>
+      <div class="score"><div class="team"><span class="kit" style="background:${M.home.club.color}"></span>${M.home.club.short}</div><div class="big">${M.score[0]}<span style="color:var(--mute)">–</span>${M.score[1]}</div><div class="team r">${M.away.club.short}<span class="kit" style="background:${M.away.club.color}"></span></div></div>
+      <div class="pb"><div class="small">${M.scorers.map((s) => `${esc(s.name)} ${s.min}'${s.side !== undefined ? ` (${[M.home, M.away][s.side].club.short})` : ''}`).join(' · ') || 'No goals.'}</div>
+      <div class="small" style="margin-top:8px">Elsewhere: ${CLUBS[o1].name} ${os[0]}–${os[1]} ${CLUBS[o2].name}</div></div>
+      <div class="ph" style="border-top:1px solid var(--line)">Table</div><div class="pb">${tableHtml()}</div>
+      <div class="pb"><button class="btn" id="nx">${last ? 'Final standings' : 'Next match'}</button></div>
+    </div>
+    <div class="panel"><div class="ph">${opp.manager}'s notebook</div>
+      <div class="pb"><div style="display:flex;gap:12px;align-items:center"><img src="${IMG[opp.id]}" style="width:56px;height:56px;border-radius:12px;object-fit:cover"><div class="small">Every decision below came from SERV Reasoning, reading the same scouting report and match stats you saw. Each note ties one fact to one change.</div></div>
+      ${notesHtml(M.prePlan, 'BEFORE KICK-OFF')}${notesHtml(M.htPlan, 'AT HALF-TIME')}
+      <div class="small mono" style="margin:12px 0 6px">THE REPORT THEY READ</div><pre class="small mono" style="white-space:pre-wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12px">${esc(M.prePlan.report)}</pre>
+      </div></div>
+  </div></div>`;
+  $('#nx').onclick = () => { state.md++; last ? season() : prematch(); };
+}
+function season() {
+  const t = table(), pos = t.findIndex((r) => r.id === 'you') + 1;
+  const champ = t[0];
+  const msg = pos === 1 ? 'Three managers tried to out-think you, and none of them managed it.' : pos === 2 ? 'Second. Close, but the board expected the title.' : 'The board has seen enough. Your office has been cleared.';
+  const share = encodeURIComponent(`I finished ${pos}${pos === 1 ? 'st' : pos === 2 ? 'nd' : pos === 3 ? 'rd' : 'th'} in Touchline, a football manager where every rival manager thinks for itself on @openservai SERV Reasoning. Can you win the league? ${location.origin}`);
+  app.innerHTML = topbar() + `<div class="wrap"><div class="panel" style="max-width:720px;margin:0 auto">
+    <div class="ph">Final standings</div><div class="pb">
+    <div class="cond" style="font-size:54px;font-weight:800;line-height:1">${pos === 1 ? 'Champions' : pos + (pos === 2 ? 'nd' : pos === 3 ? 'rd' : 'th') + ' place'}</div>
+    <p style="margin:10px 0 16px;font-size:16px;color:#D5DBD3">${msg}</p>${tableHtml()}
+    <div class="small mono" style="margin-top:14px">${ledger.calls} SERV decisions · $${ledger.cost.toFixed(4)} total · ${ledger.blocked} team talk${ledger.blocked === 1 ? '' : 's'} blocked by Prompt Guard</div>
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="https://x.com/intent/post?text=${share}">Share</a><button class="btn ghost" onclick="location.reload()">New season</button></div>
+  </div></div></div>`;
+}
+title();
+</script>
+</body>
+</html>
