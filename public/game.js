@@ -95,7 +95,7 @@ function tick(m) {
   m.poss[a]++;
   const A = sides[a], D = sides[d];
   const ratio = A.st.att / D.st.def;
-  let chance = 0.085 * Math.pow(ratio, 1.6);
+  let chance = 0.135 * Math.pow(ratio, 1.6);
   // A high press leaves space behind once legs go.
   if (D.s.t.press === 'High' && m.min > 55) chance *= 1.25;
   if (r() > chance) return [];
@@ -110,13 +110,13 @@ function tick(m) {
     m.score[a]++; shooter.ref.goals++; m.scorers.push({ side: a, name: shooter.name, min: m.min });
     shooter.rating = (shooter.rating || 6.5) + 1.2;
     A.s.xi.forEach((p) => (p.rating = (p.rating || 6.5) + 0.15)); D.s.xi.filter((p) => p.slot === 'DF' || p.slot === 'GK').forEach((p) => (p.rating = (p.rating || 6.5) - 0.3));
-    return [{ type: 'goal', side: a, lane, text: `GOAL. ${shooter.name} finishes down the ${lane.toLowerCase()} for ${A.s.club.name}.`, xg }];
+    return [{ type: 'goal', side: a, lane, shooter: shooter.name, text: `GOAL. ${shooter.name} finishes down the ${lane.toLowerCase()} for ${A.s.club.name}.`, xg }];
   }
   shooter.rating = (shooter.rating || 6.5) + 0.05;
   const how = xg > 0.25 ? 'Huge chance' : xg > 0.12 ? 'Chance' : 'Half-chance';
   const end = r() < 0.5 ? 'saved' : r() < 0.6 ? 'wide' : 'blocked';
   if (end === 'saved') D.s.xi[0].rating = (D.s.xi[0].rating || 6.5) + 0.15;
-  return [{ type: 'chance', side: a, lane, text: `${how} for ${A.s.club.short}: ${shooter.name} from the ${lane.toLowerCase()}, ${end}.`, xg }];
+  return [{ type: 'chance', side: a, lane, shooter: shooter.name, end, text: `${how} for ${A.s.club.short}: ${shooter.name} from the ${lane.toLowerCase()}, ${end}.`, xg }];
 }
 function weightedPick(arr, w, r) { const ws = arr.map(w), t = ws.reduce((a, b) => a + b, 0); let x = r() * t; for (let i = 0; i < arr.length; i++) { x -= ws[i]; if (x <= 0) return arr[i]; } return arr[arr.length - 1]; }
 

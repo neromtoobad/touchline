@@ -7,339 +7,533 @@
 <meta name="description" content="A football management game where every rival manager thinks for itself. Three matches, three managers on SERV Reasoning who scout you, counter you and change shape at half-time.">
 <meta property="og:title" content="Touchline: out-think three AI managers">
 <meta property="og:description" content="Every rival manager scouts you, picks a counter-plan and adapts at half-time, on SERV Reasoning.">
-<meta property="og:image" content="/img/tunnel.jpg">
+<meta property="og:image" content="https://touchline.nerom.site/img/tunnel.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230B0E0C%22/%3E%3Cpath d=%22M6 22h20%22 stroke=%22%23C6F432%22 stroke-width=%224%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/img/stadium.jpg">
 <style>
-:root{--bg:#0B0E0C;--panel:#131815;--panel2:#1A201C;--line:#26302A;--ink:#EEF2EC;--mute:#8C978F;--lime:#C6F432;--red:#FF5A4E;--amber:#F2B53A;--blue:#6EA8FF}
+:root{--bg:#06080A;--panel:rgba(16,20,23,.88);--panel2:#1A2024;--line:#252D33;--ink:#EEF2EC;--mute:#8A959B;--lime:#C6F432;--red:#FF5A4E;--amber:#F2B53A}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body:before{content:"";position:fixed;inset:-40px;background:url(/img/stadium.jpg) center/cover;filter:blur(22px) brightness(.26) saturate(.85);z-index:-1}
 button{font:inherit;color:inherit}
 .cond{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.02em}
 .mono{font-family:'JetBrains Mono',monospace}
-#app{min-height:100vh}
-.top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,12,.92);backdrop-filter:blur(8px);z-index:5}
-.brand{font:800 24px 'Barlow Condensed';letter-spacing:.06em}
-.brand i{color:var(--lime);font-style:normal}
-.ledger{font:12px 'JetBrains Mono';color:var(--mute);display:flex;gap:16px}
-.ledger b{color:var(--ink);font-weight:600}
-.wrap{max-width:1240px;margin:0 auto;padding:22px}
-/* title */
-.title{position:relative;min-height:100vh;display:flex;align-items:flex-end;background:url(/img/tunnel.jpg) center/cover}
-.title:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,14,12,.1) 0%,rgba(11,14,12,.35) 45%,rgba(11,14,12,.97) 100%)}
-.title .in{position:relative;padding:48px;max-width:860px}
-.title h1{font:800 clamp(64px,11vw,148px)/.86 'Barlow Condensed';letter-spacing:.01em;text-transform:uppercase}
+.small{font-size:13.5px;color:var(--mute);line-height:1.5}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pl{50%{opacity:.25}}
+@keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}
+.top{display:flex;align-items:center;gap:18px;padding:12px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(6,8,10,.82);backdrop-filter:blur(12px);z-index:5}
+.brand{font:800 24px 'Barlow Condensed';letter-spacing:.06em}.brand i{color:var(--lime);font-style:normal}
+.pips{display:flex;align-items:center;gap:6px;margin-right:auto;font:600 12px 'JetBrains Mono';color:var(--mute)}
+.pips span{width:22px;height:5px;border-radius:3px;background:var(--line)}.pips span.done{background:var(--ink)}.pips span.now{background:var(--lime)}
+.pips em{font-style:normal;margin-left:6px}
+.servchip{display:flex;align-items:center;gap:12px;font:12px 'JetBrains Mono';color:var(--mute);border:1px solid var(--line);border-radius:30px;padding:7px 14px;background:rgba(20,25,28,.7)}
+.servchip b{color:var(--ink);font-weight:600}.servchip .dot{width:8px;height:8px;border-radius:50%;background:var(--lime)}
+.servchip.busy{border-color:var(--amber)}.servchip.busy .dot{background:var(--amber);animation:pl .8s infinite}
+.snd{background:transparent;border:1px solid var(--line);border-radius:30px;padding:7px 12px;font:600 12px 'JetBrains Mono';color:var(--mute);cursor:pointer}
+.wrap{max-width:1400px;margin:0 auto;padding:20px 22px 40px;animation:up .45s ease both}
+.title{position:relative;min-height:100vh;display:flex;align-items:flex-end;overflow:hidden}
+.title .bgi{position:absolute;inset:0;background:url(/img/tunnel.jpg) center/cover;animation:kb 9s ease-out both}
+.title:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,10,.05) 0%,rgba(6,8,10,.3) 45%,rgba(6,8,10,.97) 100%)}
+.title .in{position:relative;z-index:1;padding:48px;max-width:880px}
+.title .in>*{animation:up .7s ease both}.title .in>*:nth-child(2){animation-delay:.12s}.title .in>*:nth-child(3){animation-delay:.24s}.title .in>*:nth-child(4){animation-delay:.36s}.title .in>*:nth-child(5){animation-delay:.48s}
+.title h1{font:800 clamp(64px,11vw,148px)/.86 'Barlow Condensed';text-transform:uppercase}
 .title h1 i{color:var(--lime);font-style:normal}
 .title p{font-size:19px;line-height:1.5;color:#D5DBD3;margin:16px 0 26px;max-width:620px}
 .mgrs{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap}
-.mgr{display:flex;align-items:center;gap:10px;background:rgba(19,24,21,.75);border:1px solid var(--line);border-radius:14px;padding:8px 14px 8px 8px}
+.mgr{display:flex;align-items:center;gap:10px;background:rgba(16,20,23,.78);border:1px solid var(--line);border-radius:14px;padding:8px 14px 8px 8px;backdrop-filter:blur(6px)}
 .mgr img{width:44px;height:44px;border-radius:10px;object-fit:cover}
 .mgr b{display:block;font-size:14px}.mgr span{font-size:12px;color:var(--mute)}
-.btn{appearance:none;border:0;background:var(--lime);color:#0B0E0C;font:700 20px 'Barlow Condensed';letter-spacing:.06em;text-transform:uppercase;padding:14px 28px;border-radius:12px;cursor:pointer;transition:transform .12s,opacity .12s}
-.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.35;cursor:default;transform:none}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-/* panels */
-.grid{display:grid;grid-template-columns:320px 1fr 300px;gap:18px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
-.ph{padding:14px 16px;border-bottom:1px solid var(--line);font:700 15px 'Barlow Condensed';letter-spacing:.08em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
-.pb{padding:16px}
-.opp img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
-.opp .who{padding:16px}
-.opp h3{font:800 30px/1 'Barlow Condensed';text-transform:uppercase}
-.tagl{display:inline-block;font:600 12px 'JetBrains Mono';color:var(--lime);margin:6px 0 10px}
-.small{font-size:13.5px;color:var(--mute);line-height:1.5}
-.status{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mute)}
-.pulse{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:p 1s infinite}
-.pulse.ok{background:var(--lime);animation:none}
-@keyframes p{50%{opacity:.25}}
-.tg{display:grid;gap:14px}
-.tg label{font:600 12px 'JetBrains Mono';color:var(--mute);display:block;margin-bottom:7px;letter-spacing:.04em}
+.btn{appearance:none;border:0;background:var(--lime);color:#0B0E0C;font:700 20px 'Barlow Condensed';letter-spacing:.06em;text-transform:uppercase;padding:14px 28px;border-radius:12px;cursor:pointer;transition:transform .12s,box-shadow .12s;box-shadow:0 8px 30px rgba(198,244,50,.18);text-decoration:none;display:inline-block}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(198,244,50,.3)}.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.wide{width:100%;text-align:center}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;backdrop-filter:blur(10px)}
+.th{padding:13px 16px;border-bottom:1px solid var(--line);font:700 14px 'Barlow Condensed';letter-spacing:.1em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
+.tb{padding:16px}
+.fixture{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);margin-bottom:18px;background:url(/img/stadium.jpg) center 62%/cover}
+.fixture:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,8,10,.92) 0%,rgba(6,8,10,.55) 45%,rgba(6,8,10,.9) 100%)}
+.fixture .fin{position:relative;display:grid;grid-template-columns:1fr auto 1fr auto;gap:22px;align-items:center;padding:22px 26px}
+.side{display:flex;align-items:center;gap:14px}.side.r{justify-content:flex-end;text-align:right}
+.side h2{font:800 38px/1 'Barlow Condensed';text-transform:uppercase}
+.side span{font:600 12px 'JetBrains Mono';color:var(--mute)}
+.vs{text-align:center}.vs b{display:block;font:800 30px 'Barlow Condensed';color:var(--lime)}.vs span{font:600 11px 'JetBrains Mono';color:var(--mute);letter-spacing:.08em}
+.boss{display:flex;gap:12px;align-items:center;background:rgba(16,20,23,.8);border:1px solid var(--line);border-radius:16px;padding:10px 16px 10px 10px;width:380px}
+.boss img{width:74px;height:74px;border-radius:12px;object-fit:cover;flex:none}
+.boss b{font-size:16px}.boss em{font:500 12.5px/1.4 Inter;color:var(--mute);font-style:normal;display:block;margin:2px 0 6px}
+.status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pl 1s infinite;flex:none}.pulse.ok{background:var(--lime);animation:none}
+.hub{display:grid;grid-template-columns:1.05fr 1fr .85fr;gap:18px;align-items:start}
+.tg{display:grid;gap:16px}
+.tg label{font:600 11px 'JetBrains Mono';color:var(--mute);display:block;margin-bottom:7px;letter-spacing:.08em}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
-.seg button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:600 14px Inter;cursor:pointer}
+.seg button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font:600 14px Inter;cursor:pointer;transition:all .12s}
+.seg button:hover{border-color:var(--mute)}
 .seg button.on{background:var(--lime);color:#0B0E0C;border-color:var(--lime)}
-select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font:600 14px Inter;width:100%}
-.pitch{position:relative;border-radius:14px;overflow:hidden;background:#123321}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px;font:600 14px Inter;width:100%}
 canvas{display:block;width:100%;height:auto}
-.xi{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 14px;margin-top:12px}
-.pl{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)}
-.pl .pos{font:600 11px 'JetBrains Mono';color:var(--mute);width:26px}
-.pl .nm{flex:1}
-.mor{font:600 11px 'JetBrains Mono';padding:2px 6px;border-radius:5px}
+.hint{font-size:13px;color:var(--mute);line-height:1.45;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
-.tbl td,.tbl th{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
+.tbl td,.tbl th{padding:8px 5px;text-align:right;border-bottom:1px solid var(--line)}
+.tbl tr:last-child td{border-bottom:0}
 .tbl th{font:600 11px 'JetBrains Mono';color:var(--mute)}
 .tbl td:nth-child(2),.tbl th:nth-child(2){text-align:left}
+.tbl td:nth-child(2) div{display:flex;align-items:center;gap:8px}
 .tbl tr.me td{color:var(--lime);font-weight:600}
-/* match */
-.score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:18px 22px}
-.team{display:flex;align-items:center;gap:12px;font:800 28px 'Barlow Condensed';text-transform:uppercase}
-.team.r{justify-content:flex-end}
-.kit{width:14px;height:34px;border-radius:4px}
-.big{font:800 60px/1 'Barlow Condensed';display:flex;gap:16px;align-items:center}
-.clock{font:600 14px 'JetBrains Mono';color:var(--lime);text-align:center;margin-top:4px}
-.mrow{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
-.feed{height:420px;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-.ev{font-size:14px;line-height:1.45;display:grid;grid-template-columns:38px 1fr;gap:8px}
-.ev .m{font:600 12px 'JetBrains Mono';color:var(--mute);padding-top:2px}
-.ev.goal{color:var(--lime);font-weight:700}
-.ev.serv{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;color:#DDE5DA}
-.stats{display:grid;gap:10px;padding:16px}
-.srow{display:grid;grid-template-columns:44px 1fr 44px;gap:10px;align-items:center;font:600 13px 'JetBrains Mono'}
-.srow .bar{height:6px;border-radius:3px;background:var(--panel2);position:relative;overflow:hidden}
-.srow .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
-.srow .lab{grid-column:1/-1;font:600 11px 'JetBrains Mono';color:var(--mute);text-align:center;margin-bottom:-6px}
-.ttag{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 14px}
+.bar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--ink);border-radius:3px}
+.row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}.row:last-child{border-bottom:0}
+.row .pos{font:600 11px 'JetBrains Mono';color:var(--mute);width:22px}.row .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font:600 11.5px 'JetBrains Mono';padding:3px 7px;border-radius:6px;background:var(--panel2);min-width:34px;text-align:center}
+.pill.g{background:#2B3B12;color:var(--lime)}.pill.b{background:#3B1A17;color:#FF8A80}
+.sb{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;padding:16px 24px}
+.sb .tm{display:flex;align-items:center;gap:14px}.sb .tm.r{justify-content:flex-end;text-align:right}
+.sb h3{font:800 30px/1 'Barlow Condensed';text-transform:uppercase}
+.sb .sc{font:12.5px Inter;color:var(--mute);margin-top:4px;min-height:17px}
+.big{font:800 64px/1 'Barlow Condensed';display:flex;gap:14px;align-items:center;justify-content:center}
+.big span{min-width:38px;text-align:center;display:inline-block}.big .bump{animation:bump .6s ease}
+@keyframes bump{30%{transform:scale(1.5);color:var(--lime)}}
+.clock{font:600 14px 'JetBrains Mono';color:var(--lime);text-align:center;margin-top:2px}
+.prog{position:absolute;left:0;bottom:0;height:3px;background:var(--lime);transition:width .3s linear}
+.cc{display:grid;grid-template-columns:270px 1fr 340px;gap:18px;margin-top:18px;align-items:start}
+.pitchbox{position:relative}
+.goalban{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0}
+.goalban.show{animation:gb 2.3s ease both}
+@keyframes gb{0%{opacity:0;transform:scale(.7)}12%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.06)}}
+.goalban div{text-align:center;text-shadow:0 6px 40px rgba(0,0,0,.8)}
+.goalban b{display:block;font:800 150px/.85 'Barlow Condensed';letter-spacing:.02em;color:#fff}
+.goalban span{font:700 30px 'Barlow Condensed';text-transform:uppercase;letter-spacing:.06em;background:var(--lime);color:#0B0E0C;padding:4px 14px;border-radius:8px;text-shadow:none}
+.feed{max-height:330px;overflow:auto;padding:10px 14px;display:flex;flex-direction:column;gap:7px}
+.ev{font-size:13.5px;line-height:1.45;display:grid;grid-template-columns:34px 1fr;gap:8px;animation:up .3s ease both}
+.ev .m{font:600 12px 'JetBrains Mono';color:var(--mute);padding-top:1px}
+.ev.goal{background:rgba(198,244,50,.1);border:1px solid rgba(198,244,50,.35);border-radius:10px;padding:8px 10px;color:var(--lime);font-weight:700}
+.ev.note{color:var(--mute)}
+.rival{display:flex;gap:12px;align-items:center}
+.rival img{width:62px;height:62px;border-radius:12px;object-fit:cover;flex:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{font:600 12px 'JetBrains Mono';background:var(--panel2);border:1px solid var(--line);padding:5px 8px;border-radius:7px}
 .chip.l{border-color:var(--lime);color:var(--lime)}
-/* half-time & notes */
-.notes{display:grid;gap:8px}
-.note{display:grid;grid-template-columns:22px 1fr;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;line-height:1.45}
-.note .n{font:600 12px 'JetBrains Mono';color:var(--lime)}
-.note .s{color:var(--mute)}
-.quote{font:600 20px/1.3 'Barlow Condensed';letter-spacing:.01em;border-left:3px solid var(--lime);padding-left:12px;margin:6px 0}
-textarea{width:100%;min-height:84px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:15px Inter;padding:12px;resize:vertical}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-.chips button{background:transparent;border:1px solid var(--line);border-radius:20px;padding:6px 11px;font-size:13px;cursor:pointer;color:var(--mute)}
-.chips button:hover{color:var(--ink);border-color:var(--ink)}
-.eff{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px solid var(--line)}
-.up{color:var(--lime);font-weight:700}.down{color:var(--red);font-weight:700}
-.overlay{position:fixed;inset:0;background:rgba(5,7,6,.78);display:grid;place-items:center;z-index:20;padding:16px}
-.modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;max-width:620px;width:100%;overflow:hidden}
-.modal .mh{display:flex;gap:14px;align-items:center;padding:18px;border-bottom:1px solid var(--line)}
-.modal .mh img{width:64px;height:64px;border-radius:12px;object-fit:cover}
-.end{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media (max-width:1100px){.grid{grid-template-columns:1fr 1fr}.grid>.panel:last-child{grid-column:1/-1}}
-@media (max-width:760px){.grid,.mrow,.end{grid-template-columns:1fr}.title .in{padding:24px 16px}.wrap{padding:14px}.big{font-size:44px}.team{font-size:20px}.feed{height:300px}.ledger{display:none}}
+.quote{font:600 21px/1.25 'Barlow Condensed';border-left:3px solid var(--lime);padding-left:12px;margin-top:12px}
+.st{display:grid;grid-template-columns:48px 1fr 48px;gap:10px;align-items:center;font:600 13px 'JetBrains Mono';margin-bottom:10px}
+.st em{grid-column:1/-1;font:600 10.5px 'JetBrains Mono';color:var(--mute);text-align:center;font-style:normal;letter-spacing:.08em;margin-bottom:-6px}
+.st .split{height:7px;border-radius:4px;display:flex;overflow:hidden;gap:2px}.st .split i{display:block;height:100%}
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;overflow:auto;animation:fade .4s ease both}
+.overlay .obg{position:fixed;inset:0;background-size:cover;background-position:center}
+.overlay .obg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,10,.5),rgba(6,8,10,.82))}
+.versus{position:relative;text-align:center;max-width:1100px}
+.versus .line{display:flex;align-items:center;justify-content:center;gap:30px;animation:up .6s ease both}
+.versus h2{font:800 clamp(30px,4.4vw,64px)/1 'Barlow Condensed';text-transform:uppercase;white-space:nowrap}
+.versus .v{font:800 34px 'Barlow Condensed';color:var(--lime)}
+.versus .q{font:600 30px/1.2 'Barlow Condensed';margin-top:26px;animation:up .6s .5s ease both}
+.versus .who{margin-top:10px;color:var(--mute);font-size:14px;animation:up .6s .7s ease both}
+.modal{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:22px;max-width:1080px;width:100%;overflow:hidden;backdrop-filter:blur(14px);animation:up .5s ease both}
+.mh{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 22px;border-bottom:1px solid var(--line)}
+.mgrid{display:grid;grid-template-columns:1.1fr 1fr}
+.mgrid>div{padding:20px 22px}.mgrid>div+div{border-left:1px solid var(--line)}
+textarea{width:100%;min-height:92px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:15px Inter;padding:12px;resize:vertical}
+textarea:focus{outline:1px solid var(--lime)}
+.quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.quick button{background:transparent;border:1px solid var(--line);border-radius:20px;padding:6px 11px;font-size:12.5px;cursor:pointer;color:var(--mute)}
+.quick button:hover{color:var(--ink);border-color:var(--ink)}
+.room{max-height:440px;overflow:auto}
+.pr{padding:8px 0;border-bottom:1px solid var(--line)}.pr:last-child{border-bottom:0}
+.pr .l1{display:flex;align-items:center;gap:8px;font-size:14px}.pr .l1 b{flex:1;font-weight:600}
+.pr .tr{font-size:12px;color:var(--mute)}
+.pr .why{font-size:12.5px;color:#C9D2CC;margin-top:3px;line-height:1.4;animation:up .4s ease both}
+.delta{font:700 12px 'JetBrains Mono';padding:3px 7px;border-radius:6px;animation:up .4s ease both}
+.delta.up{background:#2B3B12;color:var(--lime)}.delta.down{background:#3B1A17;color:#FF8A80}
+.tone{font:800 26px/1.1 'Barlow Condensed';text-transform:uppercase;margin-bottom:4px}
+.hero{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);margin-bottom:18px;background:url(/img/stadium.jpg) center 62%/cover}
+.hero:before{content:"";position:absolute;inset:0;background:rgba(6,8,10,.78)}
+.hero .hin{position:relative;padding:26px;text-align:center}
+.res{display:inline-block;font:800 16px 'Barlow Condensed';letter-spacing:.14em;padding:4px 14px;border-radius:8px;margin-bottom:10px}
+.ft{display:flex;align-items:center;justify-content:center;gap:28px}
+.ft h2{font:800 40px/1 'Barlow Condensed';text-transform:uppercase}
+.ft .n{font:800 96px/1 'Barlow Condensed'}
+.end{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px;align-items:start}
+.tl{position:relative;padding-left:26px;margin:6px 0 4px}
+.tl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.nt{position:relative;padding:0 0 14px;animation:up .4s ease both}
+.nt:before{content:"";position:absolute;left:-23px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(198,244,50,.15)}
+.nt .s{font-size:13.5px;color:var(--mute);line-height:1.45}.nt .d{font-size:15px;line-height:1.45;margin-top:2px}
+.nt .k{font:600 10px 'JetBrains Mono';letter-spacing:.1em;color:var(--mute);margin-right:6px}.nt .d .k{color:var(--lime)}
+.sec{font:600 11px 'JetBrains Mono';letter-spacing:.06em;color:var(--mute);margin:16px 0 10px;display:flex;align-items:center;gap:10px}
+.sec:after{content:"";flex:1;height:1px;background:var(--line)}
+details{margin-top:6px}summary{cursor:pointer;font:600 12px 'JetBrains Mono';color:var(--mute)}
+pre{white-space:pre-wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font:12px/1.55 'JetBrains Mono';color:var(--mute);margin-top:8px}
+.season{position:relative;min-height:calc(100vh - 56px);display:flex;align-items:flex-end;background-size:cover;background-position:center}
+.season:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,8,10,.94) 0%,rgba(6,8,10,.7) 46%,rgba(6,8,10,.15) 100%)}
+.season .in{position:relative;padding:44px;max-width:640px;animation:up .7s ease both}
+.season h1{font:800 clamp(64px,9vw,128px)/.88 'Barlow Condensed';text-transform:uppercase}
+@media (max-width:1180px){.hub{grid-template-columns:1fr 1fr}.hub>:last-child{grid-column:1/-1}.cc{grid-template-columns:1fr 320px}.cc>:first-child{display:none}.fixture .fin{grid-template-columns:1fr auto 1fr}.boss{grid-column:1/-1;width:auto}}
+@media (max-width:820px){.hub,.cc,.end,.mgrid,.two{grid-template-columns:1fr}.mgrid>div+div{border-left:0;border-top:1px solid var(--line)}.title .in,.season .in{padding:24px 16px}.wrap{padding:14px}.big{font-size:44px}.sb h3{font-size:19px}.side h2{font-size:24px}.servchip span:not(.dot),.pips em{display:none}.ft{gap:12px;flex-wrap:wrap}.ft .n{font-size:64px}.ft h2{font-size:22px}.goalban b{font-size:90px}}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script src="/game.js"></script>
 <script>
+(() => {
 const app = $('#app');
 const IMG = { blank: '/img/blank.jpg', ortega: '/img/ortega.jpg', ferrier: '/img/ferrier.jpg' };
-const morCol = (m) => (m >= 8 ? 'background:#2B3B12;color:#C6F432' : m >= 6 ? 'background:#26302A;color:#DDE5DA' : 'background:#3B1A17;color:#FF8A80');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const sur = (n) => String(n).split(' ').slice(1).join(' ') || String(n);
+const ord = (n) => n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th');
+const morCls = (m) => (m >= 8 ? 'g' : m >= 6 ? '' : 'b');
+const ratCls = (r) => (r >= 7.4 ? 'g' : r < 6.2 ? 'b' : '');
+const rat = (p) => clamp(p.rating || 6.5, 4, 10);
 
-function topbar() {
-  return `<div class="top"><div class="brand">TOUCH<i>LINE</i></div><div class="ledger">
-    <span>SERV calls <b>${ledger.calls}</b></span><span>spent <b>$${ledger.cost.toFixed(4)}</b></span><span>avg <b>${ledger.calls ? (ledger.ms / ledger.calls / 1000).toFixed(1) : '0.0'}s</b></span><span>blocked <b>${ledger.blocked}</b></span></div></div>`;
+function crest(c, s = 44) {
+  const ink = c.ink === '#111' ? '#1a1d1a' : '#fff';
+  const motif = {
+    you: `<path d="M20 13l2.6 6.4h6.8l-5.4 4.2 2 6.8-6-4.2-6 4.2 2-6.8-5.4-4.2h6.8z" fill="${ink}"/>`,
+    blank: `<path d="M9 17h22v4H9zM9 25h22v4H9z" fill="${ink}" opacity=".9"/>`,
+    ortega: `<path d="M20 13l9 16H11z" fill="${ink}" opacity=".92"/>`,
+    ferrier: `<circle cx="20" cy="23" r="7" fill="none" stroke="${ink}" stroke-width="3.2"/>`,
+  }[c.id];
+  return `<svg width="${s}" height="${Math.round(s * 1.15)}" viewBox="0 0 40 46" style="flex:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))"><path d="M3 4h34v22c0 10-8 15-17 18C11 41 3 36 3 26z" fill="${c.color}" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/><path d="M3 4h34v6H3z" fill="rgba(0,0,0,.22)"/>${motif}</svg>`;
 }
-const refreshTop = () => { const t = $('.top'); if (t) t.outerHTML = topbar(); };
+
+// ---------- sound ----------
+let AC = null, master = null, muted = false, amb = null;
+function audio() { if (AC) return; try { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = muted ? 0 : 0.5; master.connect(AC.destination); } catch (e) { AC = null; } }
+function noiseBuf(sec) { const b = AC.createBuffer(1, AC.sampleRate * sec, AC.sampleRate), d = b.getChannelData(0); let last = 0; for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } return b; }
+function ambience(on) {
+  if (!AC) return;
+  if (on && !amb) { const s = AC.createBufferSource(); s.buffer = noiseBuf(4); s.loop = true; const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 650; f.Q.value = 0.4; const g = AC.createGain(); g.gain.value = 0.0001; g.gain.linearRampToValueAtTime(0.55, AC.currentTime + 1.5); s.connect(f); f.connect(g); g.connect(master); s.start(); amb = { s, g }; }
+  else if (!on && amb) { const a = amb; amb = null; a.g.gain.linearRampToValueAtTime(0.0001, AC.currentTime + 0.8); setTimeout(() => { try { a.s.stop(); } catch (e) {} }, 900); }
+}
+function roar(big) { if (!AC) return; const s = AC.createBufferSource(); s.buffer = noiseBuf(3); const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = big ? 1100 : 800; f.Q.value = 0.5; const g = AC.createGain(), t = AC.currentTime; g.gain.setValueAtTime(0.001, t); g.gain.exponentialRampToValueAtTime(big ? 2.4 : 0.9, t + 0.25); g.gain.exponentialRampToValueAtTime(0.001, t + (big ? 2.8 : 1.2)); s.connect(f); f.connect(g); g.connect(master); s.start(); s.stop(t + 3); }
+function whistle(n = 1) { if (!AC) return; for (let i = 0; i < n; i++) { const t = AC.currentTime + i * 0.42, L = i === n - 1 ? 0.5 : 0.22; const o = AC.createOscillator(), g = AC.createGain(), l = AC.createOscillator(), lg = AC.createGain(); o.type = 'square'; o.frequency.value = 2350; l.frequency.value = 38; lg.gain.value = 90; l.connect(lg); lg.connect(o.frequency); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.1, t + 0.02); g.gain.setValueAtTime(0.1, t + L); g.gain.linearRampToValueAtTime(0, t + L + 0.08); o.connect(g); g.connect(master); o.start(t); l.start(t); o.stop(t + 0.8); l.stop(t + 0.8); } }
+
+// ---------- top bar + SERV ----------
+let inflight = 0;
+function topbar() {
+  const avgS = ledger.calls ? (ledger.ms / ledger.calls / 1000).toFixed(1) : '0.0';
+  return `<div class="top"><div class="brand">TOUCH<i>LINE</i></div>
+    <div class="pips">${[0, 1, 2].map((i) => `<span class="${i < state.md ? 'done' : i === state.md ? 'now' : ''}"></span>`).join('')}<em>Matchday ${Math.min(state.md + 1, 3)} / 3</em></div>
+    <div class="servchip ${inflight ? 'busy' : ''}"><span class="dot"></span><b>SERV Reasoning</b><span>${inflight ? 'thinking…' : ledger.calls + (ledger.calls === 1 ? ' decision' : ' decisions')}</span><span>$${ledger.cost.toFixed(4)}</span><span>${avgS}s avg</span><span>${ledger.blocked} blocked</span></div>
+    <button class="snd" id="snd">${muted ? 'Sound off' : 'Sound on'}</button></div>`;
+}
+function bindTop() { const b = $('#snd'); if (b) b.onclick = () => { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.5; refreshTop(); }; }
+function refreshTop() { const t = $('.top'); if (t) { t.outerHTML = topbar(); bindTop(); } }
+function call(body) { inflight++; refreshTop(); return serv(body).finally(() => { inflight--; refreshTop(); }); }
+
+function fit(c, W, H) { c.width = W * 2; c.height = H * 2; const g = c.getContext('2d'); g.setTransform(2, 0, 0, 2, 0, 0); return g; }
+function rr(g, x, y, w, h, r) { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); }
+function shirt(g, x, y, col, ink, num, s) {
+  g.save(); g.translate(x, y); g.scale(s, s);
+  g.beginPath(); g.moveTo(-9, -13); g.lineTo(-17, -8); g.lineTo(-13, -1); g.lineTo(-9, -3); g.lineTo(-9, 13); g.lineTo(9, 13); g.lineTo(9, -3); g.lineTo(13, -1); g.lineTo(17, -8); g.lineTo(9, -13); g.quadraticCurveTo(0, -8, -9, -13); g.closePath();
+  g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 8; g.shadowOffsetY = 4; g.fillStyle = col; g.fill(); g.shadowColor = 'transparent';
+  g.strokeStyle = 'rgba(0,0,0,.45)'; g.lineWidth = 1.2; g.stroke();
+  g.fillStyle = ink; g.font = '700 11px Inter'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(num, 0, 3); g.restore();
+}
 
 // ---------- title ----------
 function title() {
-  app.innerHTML = `<section class="title"><div class="in">
-    <div class="small cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:10px">A football management game</div>
+  app.innerHTML = `<section class="title"><div class="bgi"></div><div class="in">
+    <div class="cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:10px">A football management game</div>
     <h1>Out-think<br><i>the dugout.</i></h1>
     <p>You've taken the Ashford Town job with three games to win the league. Every rival manager watches your last match, picks a plan to beat you and changes it at half-time. They think for themselves, and after each game you get to read their notes.</p>
     <div class="mgrs">${['blank', 'ortega', 'ferrier'].map((id) => `<div class="mgr"><img src="${IMG[id]}" alt=""><div><b>${CLUBS[id].manager}</b><span>${CLUBS[id].name} · ${CLUBS[id].tag}</span></div></div>`).join('')}</div>
     <button class="btn" id="go">Take the job</button>
   </div></section>`;
-  $('#go').onclick = prematch;
+  $('#go').onclick = () => { audio(); ['dressing', 'champions', 'sacked', 'stadium'].forEach((n) => { new Image().src = `/img/${n}.jpg`; }); prematch(); };
 }
 
 // ---------- pre-match ----------
 let plan = null, planP = null;
+function tableHtml() {
+  return `<table class="tbl"><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>${table().map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td><div>${crest(CLUBS[r.id], 18)}${esc(r.name)}</div></td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table>`;
+}
 function prematch() {
-  const fx = FIXTURES[state.md], opp = CLUBS[fx.opp];
+  window.scrollTo(0, 0);
+  const fx = FIXTURES[state.md], opp = CLUBS[fx.opp], t = state.tactics, last = opp.manager.split(' ')[1];
   plan = null;
   const report = scoutReport(fx.opp, state.md);
-  planP = serv({ action: 'plan', manager: fx.opp, report }).then((p) => (plan = { ...p, report })).catch(() => (plan = { ...FALLBACK, report, fallback: true }));
-  planP.then(() => { const s = $('#oppstatus'); if (s) s.innerHTML = `<span class="pulse ok"></span>${opp.manager} has named the team. You'll see it at kick-off.`; refreshTop(); });
-  const t = state.tactics;
+  planP = call({ action: 'plan', manager: fx.opp, report }).then((p) => (plan = { ...p, report })).catch(() => (plan = { ...FALLBACK, report, fallback: true }));
+  const steps = state.md === 0 ? ['is reading the scouting report…', 'is checking your squad…', 'is picking a team to beat you…'] : ['is watching your last match…', 'has spotted how you attack…', 'is picking a team to beat you…'];
+  let si = 0; const iv = setInterval(() => { const s = $('#oppstatus'); if (!s || plan) return clearInterval(iv); si = Math.min(si + 1, steps.length - 1); s.innerHTML = `<span class="pulse"></span>${last} ${steps[si]}`; }, 2600);
+  planP.then(() => { const s = $('#oppstatus'); if (s) s.innerHTML = `<span class="pulse ok"></span>Team sheet is in. You'll see it at kick-off.`; });
   const seg = (key, opts) => `<div class="seg" data-k="${key}">${opts.map((o) => `<button class="${t[key] === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div>`;
-  const oppThreats = [...opp.squad].sort((a, b) => b.att - a.att).slice(0, 3);
-  app.innerHTML = topbar() + `<div class="wrap"><div class="grid">
-    <div class="panel opp"><img src="${IMG[fx.opp]}" alt="">
-      <div class="who"><div class="small mono">MATCHDAY ${state.md + 1} OF 3 · ${fx.home ? 'HOME' : 'AWAY'}</div><h3>${opp.name}</h3><span class="tagl">${opp.manager} · ${opp.tag}</span><p class="small">${opp.line}</p></div>
-      <div class="status" id="oppstatus"><span class="pulse"></span>${opp.manager} is watching your last match…</div>
-    </div>
-    <div class="panel"><div class="ph">Your plan <span class="mono" style="font-size:12px">${CLUBS.you.name}</span></div><div class="pb tg">
-      <div class="pitch"><canvas id="pc" width="900" height="560"></canvas></div>
-      <div><label>FORMATION</label>${seg('formation', Object.keys(FORMS))}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+  const threats = [...opp.squad].sort((a, b) => b.att - a.att).slice(0, 4);
+  if (t.mark !== 'None' && !threats.some((p) => p.name === t.mark)) t.mark = 'None';
+  app.innerHTML = topbar() + `<div class="wrap">
+    <section class="fixture"><div class="fin">
+      <div class="side">${crest(CLUBS.you, 58)}<div><h2>Ashford Town</h2><span>YOU · ${fx.home ? 'HOME' : 'AWAY'}</span></div></div>
+      <div class="vs"><span>MATCHDAY ${state.md + 1} OF 3</span><b>VS</b></div>
+      <div class="side r"><div><h2>${opp.name}</h2><span>${opp.tag.toUpperCase()}</span></div>${crest(opp, 58)}</div>
+      <div class="boss"><img src="${IMG[fx.opp]}" alt=""><div><b>${opp.manager}</b><em>${opp.line}</em><div class="status" id="oppstatus"><span class="pulse"></span>${last} ${steps[0]}</div></div></div>
+    </div></section>
+    <div class="hub">
+      <div class="tile"><div class="th">Tactics board <span class="mono" id="fl" style="font-size:12px;color:var(--lime)"></span></div><canvas id="pc"></canvas></div>
+      <div class="tile"><div class="th">Team instructions</div><div class="tb tg">
+        <div><label>FORMATION</label>${seg('formation', Object.keys(FORMS))}</div>
         <div><label>MENTALITY</label>${seg('mentality', ['Defensive', 'Balanced', 'Attacking'])}</div>
         <div><label>PRESS</label>${seg('press', ['Low', 'Mid', 'High'])}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div><label>ATTACK THROUGH</label>${seg('attack_lane', ['Left', 'Centre', 'Right'])}</div>
-        <div><label>MAN-MARK</label><select id="mark"><option value="None">Nobody</option>${oppThreats.map((p) => `<option ${t.mark === p.name ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div>
+        <div><label>MAN-MARK</label><select id="mark"><option value="None">Nobody</option>${threats.map((p) => `<option ${t.mark === p.name ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div>
+        <div class="hint" id="hint"></div>
+        <button class="btn wide" id="ko">Kick off</button>
+      </div></div>
+      <div class="tg">
+        <div class="tile"><div class="th">League table</div><div class="tb" style="padding:8px 14px">${tableHtml()}</div></div>
+        <div class="tile"><div class="th">Their dangermen</div><div class="tb" style="padding:8px 16px">${threats.map((p) => `<div class="row"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><div class="bar" style="max-width:90px"><i style="width:${p.att}%"></i></div><span class="pill">${p.att}</span></div>`).join('')}</div></div>
       </div>
-      <div id="xi" class="xi"></div>
-      <button class="btn" id="ko">Kick off</button>
-    </div></div>
-    <div class="panel"><div class="ph">Table</div><div class="pb">${tableHtml()}</div>
-      <div class="ph" style="border-top:1px solid var(--line)">Their dangermen</div><div class="pb">${oppThreats.map((p) => `<div class="pl"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><span class="mono" style="font-size:12px">ATT ${p.att}</span></div>`).join('')}</div>
-    </div>
-  </div></div>`;
-  app.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); drawXI(); })));
+    </div></div>`;
+  bindTop();
+  app.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); drawBoard(); })));
   $('#mark').onchange = (e) => (t.mark = e.target.value);
-  drawXI();
+  drawBoard();
   $('#ko').onclick = async () => {
+    audio();
     if (!plan) { $('#ko').disabled = true; $('#ko').textContent = `Waiting for ${opp.manager}'s team sheet…`; await planP; }
-    play();
+    clearInterval(iv); play();
   };
 }
-function drawXI() {
-  const xi = pickXI(CLUBS.you.squad, state.tactics.formation);
-  $('#xi').innerHTML = xi.map((p) => `<div class="pl"><span class="pos">${p.slot}</span><span class="nm">${esc(p.name)}</span><span class="mor" style="${morCol(p.morale)}">${p.morale}</span></div>`).join('');
-  const c = $('#pc'); if (c) drawPitch(c.getContext('2d'), { home: { xi, club: CLUBS.you, t: state.tactics } }, null, true);
-}
-function tableHtml() {
-  return `<table class="tbl"><tr><th>#</th><th>Club</th><th>P</th><th>GD</th><th>Pts</th></tr>${table().map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td>${r.pts}</td></tr>`).join('')}</table>`;
-}
-
-// ---------- pitch ----------
-function slots(xi, form, home) {
-  const f = FORMS[form], pos = [];
-  const lines = [['GK', 1, 0.04], ['DF', f.DF, 0.16], ['MF', f.MF, 0.29], ['FW', f.FW, 0.42]];
-  let k = 0;
-  for (const [, n, x] of lines) for (let i = 0; i < n; i++, k++) { const y = (i + 1) / (n + 1); pos.push({ x: home ? x : 1 - x, y, p: xi[k] }); }
-  return pos;
-}
-function drawPitch(g, teams, ball, solo) {
-  const W = g.canvas.width, H = g.canvas.height;
-  for (let i = 0; i < 10; i++) { g.fillStyle = i % 2 ? '#174A2E' : '#1A5233'; g.fillRect((W / 10) * i, 0, W / 10, H); }
-  g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2;
-  g.strokeRect(20, 20, W - 40, H - 40); g.beginPath(); g.moveTo(W / 2, 20); g.lineTo(W / 2, H - 20); g.stroke();
-  g.beginPath(); g.arc(W / 2, H / 2, 62, 0, 7); g.stroke();
-  g.strokeRect(20, H / 2 - 120, 110, 240); g.strokeRect(W - 130, H / 2 - 120, 110, 240);
-  g.strokeRect(20, H / 2 - 52, 40, 104); g.strokeRect(W - 60, H / 2 - 52, 40, 104);
-  const put = (side, color, ink, home) => {
-    if (!side) return;
-    for (const s of slots(side.xi, side.t.formation, home)) {
-      const x = 20 + s.x * (W - 40) * (solo ? 1.55 : 1) - (solo ? (W - 40) * 0.0 : 0), y = 20 + s.y * (H - 40);
-      const xx = solo ? 50 + (s.x / 0.42) * (W - 140) : x;
-      g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(xx + 2, y + 13, 13, 5, 0, 0, 7); g.fill();
-      g.fillStyle = color; g.beginPath(); g.arc(xx, y, 13, 0, 7); g.fill();
-      g.strokeStyle = 'rgba(0,0,0,.4)'; g.lineWidth = 2; g.stroke();
-      if (solo || true) { g.fillStyle = '#fff'; g.font = '600 13px Inter'; g.textAlign = 'center'; g.fillText(s.p.name.split(' ')[1], xx, y + 30); }
-    }
-  };
-  put(teams.home, teams.home.club.color, teams.home.club.ink, true);
-  if (!solo) put(teams.away, teams.away.club.color, teams.away.club.ink, false);
-  if (ball) { g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(ball.x + 2, ball.y + 7, 7, 3, 0, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ball.x, ball.y, 7, 0, 7); g.fill(); }
+const HINTS = {
+  press: { High: 'High press wins the ball further up, but legs go after the hour and space opens behind you.', Mid: 'Mid press is the safe middle: steady midfield, steady legs.', Low: 'Low press gives up midfield to protect your back line and save energy.' },
+  mentality: { Defensive: 'Defensive: harder to score against, fewer chances of your own.', Balanced: 'Balanced: no bonus, no weakness.', Attacking: 'Attacking: more chances for you, more room for them.' },
+};
+function drawBoard() {
+  const c = $('#pc'); if (!c) return;
+  const W = 560, H = 640, g = fit(c, W, H), t = state.tactics, xi = pickXI(CLUBS.you.squad, t.formation), f = FORMS[t.formation];
+  for (let i = 0; i < 10; i++) { g.fillStyle = i % 2 ? '#15472C' : '#195232'; g.fillRect(0, (H / 10) * i, W, H / 10); }
+  g.strokeStyle = 'rgba(255,255,255,.5)'; g.lineWidth = 2;
+  g.strokeRect(22, 22, W - 44, H - 44); g.beginPath(); g.moveTo(22, H / 2); g.lineTo(W - 22, H / 2); g.stroke();
+  g.beginPath(); g.arc(W / 2, H / 2, 58, 0, 7); g.stroke();
+  g.strokeRect(W / 2 - 130, 22, 260, 96); g.strokeRect(W / 2 - 130, H - 118, 260, 96); g.strokeRect(W / 2 - 56, 22, 112, 36); g.strokeRect(W / 2 - 56, H - 58, 112, 36);
+  const lx = { Left: 0.2, Centre: 0.5, Right: 0.8 }[t.attack_lane] * W;
+  const gr = g.createLinearGradient(0, H * 0.5, 0, 40); gr.addColorStop(0, 'rgba(198,244,50,0)'); gr.addColorStop(1, 'rgba(198,244,50,.34)');
+  g.fillStyle = gr; g.fillRect(lx - 62, 60, 124, H * 0.5 - 60);
+  g.fillStyle = 'rgba(198,244,50,.9)'; g.beginPath(); g.moveTo(lx, 34); g.lineTo(lx - 20, 64); g.lineTo(lx + 20, 64); g.closePath(); g.fill();
+  const py = { High: 0.3, Mid: 0.44, Low: 0.58 }[t.press] * H;
+  g.setLineDash([8, 8]); g.strokeStyle = 'rgba(255,255,255,.75)'; g.beginPath(); g.moveTo(30, py); g.lineTo(W - 30, py); g.stroke(); g.setLineDash([]);
+  g.fillStyle = 'rgba(255,255,255,.85)'; g.font = '600 10px JetBrains Mono, monospace'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText('PRESS LINE', 34, py - 7);
+  const sh = t.mentality === 'Attacking' ? -0.035 : t.mentality === 'Defensive' ? 0.035 : 0;
+  const rows = [[1, 0.9], [f.DF, 0.73 + sh], [f.MF, 0.52 + sh], [f.FW, 0.3 + sh]]; let k = 0;
+  for (const [n, y] of rows) for (let i = 0; i < n; i++, k++) {
+    const p = xi[k], x = (0.06 + 0.88 * (i + 1) / (n + 1)) * W, yy = y * H;
+    shirt(g, x, yy, CLUBS.you.color, '#111', k + 1, 1.45);
+    g.font = '600 12px Inter'; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,.55)'; const w = g.measureText(sur(p.name)).width + 12;
+    rr(g, x - w / 2, yy + 22, w, 18, 6); g.fill(); g.fillStyle = '#fff'; g.textBaseline = 'middle'; g.fillText(sur(p.name), x, yy + 31.5);
+    g.fillStyle = p.morale >= 8 ? '#C6F432' : p.morale >= 6 ? '#DDE5DA' : '#FF5A4E'; g.beginPath(); g.arc(x + 20, yy - 16, 4.5, 0, 7); g.fill();
+  }
+  $('#fl').textContent = t.formation;
+  $('#hint').textContent = HINTS.press[t.press] + ' ' + HINTS.mentality[t.mentality];
 }
 
 // ---------- match ----------
-let M = null, talkRes = null, htPlan = null;
-async function play() {
-  const fx = FIXTURES[state.md], oppId = fx.opp;
-  const mine = { club: CLUBS.you, t: { ...state.tactics }, xi: pickXI(CLUBS.you.squad, state.tactics.formation) };
-  const theirs = { club: CLUBS[oppId], t: { formation: plan.formation, mentality: plan.mentality, press: plan.press, attack_lane: plan.attack_lane, mark: plan.mark }, xi: pickXI(CLUBS[oppId].squad, plan.formation) };
-  M = newMatch(fx.home ? mine : theirs, fx.home ? theirs : mine, 1000 + state.md * 77 + Date.now() % 1000);
-  M.meIdx = fx.home ? 0 : 1; M.oppIdx = 1 - M.meIdx; M.oppId = oppId; M.prePlan = plan;
-  app.innerHTML = topbar() + `<div class="wrap">
-    <div class="panel"><div class="score">
-      <div class="team"><span class="kit" style="background:${M.home.club.color}"></span>${M.home.club.name}</div>
-      <div><div class="big"><span id="s0">0</span><span style="color:var(--mute)">–</span><span id="s1">0</span></div><div class="clock" id="clk">0'</div></div>
-      <div class="team r">${M.away.club.name}<span class="kit" style="background:${M.away.club.color}"></span></div>
-    </div></div>
-    <div class="mrow" style="margin-top:18px">
-      <div class="panel"><div class="pitch" style="border-radius:0"><canvas id="mc" width="1000" height="620"></canvas></div>
-        <div class="stats" id="stats"></div></div>
-      <div class="panel"><div class="ph">Commentary</div><div class="feed" id="feed"></div></div>
-    </div></div>`;
-  feed({ min: 0, type: 'serv', html: servCard(CLUBS[oppId], plan, 'Pre-match plan', true) });
-  feed({ min: 0, text: `Kick-off. ${M.home.club.name} v ${M.away.club.name}.` });
-  await half(45);
-  halftime();
+let M = null, sim = null, talkRes = null, htPlan = null;
+function layout(side) {
+  const s = [M.home, M.away][side], f = FORMS[s.t.formation], old = sim.pl.filter((p) => p.side === side);
+  sim.pl = sim.pl.filter((p) => p.side !== side);
+  const rows = [[1, 0.045], [f.DF, 0.2], [f.MF, 0.36], [f.FW, 0.5]]; let k = 0;
+  rows.forEach(([n, x], ri) => { for (let i = 0; i < n; i++, k++) { const by = 0.06 + 0.88 * (i + 1) / (n + 1), bx = side === 0 ? x : 1 - x, o = old[k]; sim.pl.push({ side, row: ri, bx, by, x: o ? o.x : bx, y: o ? o.y : by, p: s.xi[k], num: k + 1, ph: Math.random() * 6.28 }); } });
 }
-function servCard(club, p, label, hideNotes) {
-  return `<div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><img src="${IMG[club.id]}" style="width:34px;height:34px;border-radius:8px;object-fit:cover"><div><b>${club.manager}</b> <span class="small">· ${label}${p.fallback ? ' (offline)' : ''}</span></div></div>
-  <div class="chips" style="margin:4px 0 6px"><span class="chip l">${p.formation}</span><span class="chip">${p.mentality}</span><span class="chip">${p.press} press</span><span class="chip">Attack ${p.attack_lane}</span>${p.mark && p.mark !== 'None' ? `<span class="chip">Marking ${esc(p.mark)}</span>` : ''}</div>
-  <div class="quote">"${esc(p.quote)}"</div>${hideNotes ? '<div class="small">Their reasoning is shown at full-time.</div>' : ''}`;
+const nearest = (side) => sim.pl.filter((p) => p.side === side && p.row > 0).sort((a, b) => Math.hypot(a.x - sim.ball.x, a.y - sim.ball.y) - Math.hypot(b.x - sim.ball.x, b.y - sim.ball.y))[0];
+function frame(ts) {
+  const c = $('#mc'); if (!c || !sim) return;
+  const g = c.getContext('2d'), W = 1000, H = 620, mg = 30, b = sim.ball;
+  const dt = Math.min(50, ts - (sim.last || ts)); sim.last = ts; sim.t += dt / 1000; const f = dt / 16;
+  if (!sim.busy) {
+    if (sim.t > sim.nextPass) { const mates = sim.pl.filter((p) => p.side === sim.poss && p.row > 0 && p !== sim.holder); const near = mates.filter((p) => Math.hypot(p.x - b.x, p.y - b.y) < 0.34); const pool = near.length ? near : mates; sim.holder = pool[Math.floor(Math.random() * pool.length)]; sim.nextPass = sim.t + 0.55 + Math.random() * 0.9; }
+    if (sim.holder) { b.tx = sim.holder.x + (sim.holder.side === 0 ? 0.013 : -0.013); b.ty = sim.holder.y; }
+  }
+  b.x += (b.tx - b.x) * Math.min(1, b.k * f); b.y += (b.ty - b.y) * Math.min(1, b.k * f);
+  for (const p of sim.pl) {
+    const dir = p.side === 0 ? 1 : -1, inP = sim.poss === p.side; let tx = p.bx, ty = p.by, k = 0.05;
+    if (p.run) { tx = p.run.x; ty = p.run.y; k = 0.11; }
+    else if (p.row > 0) {
+      tx += (b.x - 0.5) * 0.44 + dir * (inP ? 0.075 : -0.03) * (p.row / 3 + 0.35); ty += (b.y - 0.5) * 0.2;
+      if (!inP && Math.hypot(b.x - p.x, b.y - p.y) < 0.15) { tx += (b.x - tx) * 0.55; ty += (b.y - ty) * 0.55; k = 0.07; }
+      tx += Math.sin(sim.t * 0.9 + p.ph) * 0.012; ty += Math.cos(sim.t * 0.7 + p.ph * 1.7) * 0.02;
+    } else { ty = 0.5 + (b.y - 0.5) * 0.22; tx = p.bx + dir * clamp((b.x - 0.5) * dir, 0, 0.5) * 0.06; }
+    p.x += (clamp(tx, 0.025, 0.975) - p.x) * Math.min(1, k * f); p.y += (clamp(ty, 0.05, 0.95) - p.y) * Math.min(1, k * f);
+  }
+  g.setTransform(c.width / W, 0, 0, c.width / W, 0, 0);
+  for (let i = 0; i < 14; i++) { g.fillStyle = i % 2 ? '#14452A' : '#185031'; g.fillRect((W / 14) * i, 0, W / 14 + 1, H); }
+  const X = (x) => mg + x * (W - mg * 2), Y = (y) => mg + y * (H - mg * 2);
+  g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = 2;
+  g.strokeRect(mg, mg, W - mg * 2, H - mg * 2); g.beginPath(); g.moveTo(W / 2, mg); g.lineTo(W / 2, H - mg); g.stroke();
+  g.beginPath(); g.arc(W / 2, H / 2, 66, 0, 7); g.stroke(); g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(W / 2, H / 2, 3, 0, 7); g.fill();
+  g.strokeRect(mg, H / 2 - 130, 120, 260); g.strokeRect(W - mg - 120, H / 2 - 130, 120, 260); g.strokeRect(mg, H / 2 - 58, 42, 116); g.strokeRect(W - mg - 42, H / 2 - 58, 42, 116);
+  g.beginPath(); g.arc(mg + 120, H / 2, 46, -1.05, 1.05); g.stroke(); g.beginPath(); g.arc(W - mg - 120, H / 2, 46, Math.PI - 1.05, Math.PI + 1.05); g.stroke();
+  g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(mg - 14, H / 2 - 30, 14, 60); g.fillRect(W - mg, H / 2 - 30, 14, 60);
+  g.strokeStyle = 'rgba(255,255,255,.85)'; g.strokeRect(mg - 14, H / 2 - 30, 14, 60); g.strokeRect(W - mg, H / 2 - 30, 14, 60);
+  if (sim.trail && sim.t - sim.trail.t < 0.7) { g.strokeStyle = `rgba(255,255,255,${0.75 * (1 - (sim.t - sim.trail.t) / 0.7)})`; g.lineWidth = 3; g.beginPath(); g.moveTo(X(sim.trail.x), Y(sim.trail.y)); g.lineTo(X(b.x), Y(b.y)); g.stroke(); }
+  for (const p of [...sim.pl].sort((a, c2) => a.y - c2.y)) {
+    const club = [M.home, M.away][p.side].club, x = X(p.x), y = Y(p.y);
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x + 2, y + 12, 12, 5, 0, 0, 7); g.fill();
+    if (p === sim.holder) { g.strokeStyle = '#C6F432'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 16, 0, 7); g.stroke(); }
+    g.fillStyle = club.color; g.beginPath(); g.arc(x, y, 12, 0, 7); g.fill(); g.strokeStyle = 'rgba(0,0,0,.5)'; g.lineWidth = 1.5; g.stroke();
+    g.fillStyle = club.ink === '#111' ? '#111' : '#fff'; g.font = '700 11px Inter'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(p.num, x, y + 0.5);
+    g.font = '600 11px Inter'; g.fillStyle = 'rgba(255,255,255,.82)'; g.fillText(sur(p.p.name), x, y + 25);
+  }
+  g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(X(b.x) + 2, Y(b.y) + 6, 6, 3, 0, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(X(b.x), Y(b.y), 6, 0, 7); g.fill(); g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 1; g.stroke();
+  const vg = g.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.72); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.5)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  if (sim.flash > 0.01) { g.fillStyle = `rgba(255,255,255,${sim.flash * 0.5})`; g.fillRect(0, 0, W, H); sim.flash *= Math.pow(0.9, f); }
+  requestAnimationFrame(frame);
+}
+function drawMom() {
+  const c = $('#mom'); if (!c || !sim) return; const W = 1000, H = 120, g = fit(c, W, H), mid = H / 2, bw = (W - 20) / 90;
+  g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(10, mid, W - 20, 1);
+  g.strokeStyle = 'rgba(255,255,255,.2)'; g.setLineDash([4, 5]); g.beginPath(); g.moveTo(10 + bw * 45, 6); g.lineTo(10 + bw * 45, H - 6); g.stroke(); g.setLineDash([]);
+  sim.mom.forEach((m, i) => { const h = clamp(Math.abs(m.v) * 15, 3, mid - 8), x = 10 + bw * i; g.fillStyle = m.v >= 0 ? M.home.club.color : M.away.club.color; rr(g, x + 1, m.v >= 0 ? mid - h : mid + 1, bw - 2, h, 2); g.fill(); if (m.goal !== undefined) { g.fillStyle = '#C6F432'; g.beginPath(); g.arc(x + bw / 2, m.goal === 0 ? 9 : H - 9, 5, 0, 7); g.fill(); } });
+  g.font = '600 10px JetBrains Mono, monospace'; g.fillStyle = 'rgba(255,255,255,.55)'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText(M.home.club.short, 12, 14); g.fillText(M.away.club.short, 12, H - 6);
+}
+function planCard(club, p, label) {
+  return `<div class="rival"><img src="${IMG[club.id]}" alt=""><div><b>${club.manager}</b><div class="small">${label}${p.fallback ? ' (offline)' : ''}</div></div></div>
+  <div class="chips" style="margin-top:12px"><span class="chip l">${p.formation}</span><span class="chip">${p.mentality}</span><span class="chip">${p.press} press</span><span class="chip">Attack ${p.attack_lane}</span>${p.mark && p.mark !== 'None' ? `<span class="chip">Marking ${esc(sur(p.mark))}</span>` : ''}</div>
+  <div class="quote">"${esc(p.quote)}"</div><div class="small" style="margin-top:8px">You get their reasoning at full-time.</div>`;
 }
 function feed(e) {
   const f = $('#feed'); if (!f) return;
   const d = document.createElement('div'); d.className = `ev ${e.type || ''}`;
-  d.innerHTML = e.type === 'serv' ? e.html : `<span class="m">${e.min}'</span><span>${esc(e.text)}</span>`;
-  f.prepend(d);
+  d.innerHTML = `<span class="m">${e.min}'</span><span>${esc(e.text)}</span>`; f.prepend(d);
 }
-let ballPos = { x: 500, y: 310 };
-function render(target) {
-  const c = $('#mc'); if (!c) return; const g = c.getContext('2d');
-  const step = () => { ballPos.x += (target.x - ballPos.x) * 0.18; ballPos.y += (target.y - ballPos.y) * 0.18; drawPitch(g, M, ballPos); };
-  for (let i = 0; i < 8; i++) setTimeout(step, i * 30);
+function hud() {
+  $('#clk').textContent = M.min + "'"; $('#prog').style.width = (M.min / 90) * 100 + '%';
+  const tot = M.poss[0] + M.poss[1] || 1, ph = Math.round((M.poss[0] / tot) * 100), hc = M.home.club.color, ac = M.away.club.color;
+  const row = (lab, a, b, fa, fb) => { const t = fa + fb || 1; return `<div class="st"><em>${lab}</em><span>${a}</span><div class="split"><i style="width:${(fa / t) * 100}%;background:${hc}"></i><i style="flex:1;background:${ac}"></i></div><span style="text-align:right">${b}</span></div>`; };
+  $('#stats').innerHTML = row('POSSESSION', ph + '%', 100 - ph + '%', ph, 100 - ph) + row('SHOTS', M.shots[0], M.shots[1], M.shots[0] || 0.5, M.shots[1] || 0.5) + row('EXPECTED GOALS', M.xg[0].toFixed(2), M.xg[1].toFixed(2), M.xg[0] || 0.05, M.xg[1] || 0.05);
+  const me = [M.home, M.away][M.meIdx], pf = me.t.press === 'High' ? 1.35 : me.t.press === 'Low' ? 0.8 : 1;
+  $('#xi').innerHTML = me.xi.map((p, i) => { const cond = clamp(Math.round(100 - M.min * (1.3 - p.sta / 100) * 0.62 * pf), 30, 100), r = rat(p); return `<div class="row"><span class="pos">${i + 1}</span><span class="nm">${esc(sur(p.name))}</span><div class="bar" style="max-width:54px"><i style="width:${cond}%;background:${cond > 75 ? '#C6F432' : cond > 55 ? '#F2B53A' : '#FF5A4E'}"></i></div><span class="pill ${ratCls(r)}">${r.toFixed(1)}</span></div>`; }).join('');
+  const sc = (side) => M.scorers.filter((s) => s.side === side).map((s) => `${sur(s.name)} ${s.min}'`).join(', ');
+  $('#sc0').textContent = sc(0); $('#sc1').textContent = sc(1);
+  drawMom();
 }
-function stats() {
-  const tot = M.poss[0] + M.poss[1] || 1, ph = Math.round((M.poss[0] / tot) * 100);
-  const row = (lab, a, b, fa, fb) => { const t = fa + fb || 1; return `<div class="srow"><span class="lab">${lab}</span><span>${a}</span><div class="bar"><i style="width:${(fa / t) * 100}%"></i></div><span style="text-align:right">${b}</span></div>`; };
-  $('#stats').innerHTML = row('POSSESSION', ph + '%', 100 - ph + '%', ph, 100 - ph) + row('SHOTS', M.shots[0], M.shots[1], M.shots[0], M.shots[1]) + row('xG', M.xg[0].toFixed(2), M.xg[1].toFixed(2), M.xg[0], M.xg[1]);
+async function play() {
+  window.scrollTo(0, 0);
+  const fx = FIXTURES[state.md], oppId = fx.opp, opp = CLUBS[oppId];
+  const mine = { club: CLUBS.you, t: { ...state.tactics }, xi: pickXI(CLUBS.you.squad, state.tactics.formation) };
+  const theirs = { club: opp, t: { formation: plan.formation, mentality: plan.mentality, press: plan.press, attack_lane: plan.attack_lane, mark: plan.mark }, xi: pickXI(opp.squad, plan.formation) };
+  M = newMatch(fx.home ? mine : theirs, fx.home ? theirs : mine, 1000 + state.md * 77 + (Date.now() % 1000));
+  M.meIdx = fx.home ? 0 : 1; M.oppIdx = 1 - M.meIdx; M.oppId = oppId; M.prePlan = plan;
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  ov.innerHTML = `<div class="obg" style="background-image:url(/img/stadium.jpg)"></div><div class="versus"><div class="line">${crest(M.home.club, 80)}<h2>${M.home.club.name}</h2><span class="v">V</span><h2>${M.away.club.name}</h2>${crest(M.away.club, 80)}</div><div class="q">"${esc(plan.quote)}"</div><div class="who">${opp.manager}, ${opp.name} · lines up ${plan.formation}, ${plan.mentality.toLowerCase()}, ${plan.press.toLowerCase()} press</div></div>`;
+  document.body.appendChild(ov);
+  app.innerHTML = topbar() + `<div class="wrap">
+    <div class="tile"><div class="sb">
+      <div class="tm">${crest(M.home.club, 46)}<div><h3>${M.home.club.name}</h3><div class="sc" id="sc0"></div></div></div>
+      <div><div class="big"><span id="s0">0</span><span style="color:var(--mute);min-width:0">–</span><span id="s1">0</span></div><div class="clock" id="clk">0'</div></div>
+      <div class="tm r"><div><h3>${M.away.club.name}</h3><div class="sc" id="sc1"></div></div>${crest(M.away.club, 46)}</div>
+      <div class="prog" id="prog" style="width:0"></div>
+    </div></div>
+    <div class="cc">
+      <div class="tile"><div class="th">Your XI <span class="mono" style="font-size:11px">FIT · RATING</span></div><div class="tb" style="padding:6px 14px" id="xi"></div></div>
+      <div class="tg">
+        <div class="tile pitchbox"><canvas id="mc" width="2000" height="1240"></canvas><div class="goalban" id="gb"><div><b>GOAL</b><span id="gbt"></span></div></div></div>
+        <div class="tile"><div class="th">Match momentum</div><canvas id="mom"></canvas></div>
+      </div>
+      <div class="tg">
+        <div class="tile"><div class="th">Opposition dugout</div><div class="tb" id="rival">${planCard(opp, plan, 'Pre-match plan')}</div></div>
+        <div class="tile"><div class="th">Match stats</div><div class="tb" id="stats" style="padding-bottom:6px"></div></div>
+        <div class="tile"><div class="th">Commentary</div><div class="feed" id="feed"></div></div>
+      </div>
+    </div></div>`;
+  bindTop();
+  sim = { pl: [], ball: { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, k: 0.14 }, poss: 0, holder: null, flash: 0, t: 0, nextPass: 0, mom: [], busy: false };
+  layout(0); layout(1); hud(); requestAnimationFrame(frame);
+  await sleep(3200); ov.style.transition = 'opacity .5s'; ov.style.opacity = 0; await sleep(500); ov.remove();
+  whistle(1); feed({ min: 0, text: `Kick-off. ${M.home.club.name} v ${M.away.club.name}.`, type: 'note' });
+  await half(45);
+  halftime();
 }
+async function shotSeq(e) {
+  const side = e.side, dir = side === 0 ? 1 : -1, b = sim.ball, goal = e.type === 'goal';
+  const laneY = { Left: 0.2, Centre: 0.5, Right: 0.8 }[e.lane], y = side === 0 ? laneY : 1 - laneY;
+  const att = sim.pl.filter((p) => p.side === side && p.row >= 2), sh = att.find((p) => p.p.name === e.shooter) || att[att.length - 1];
+  sim.busy = true; sim.poss = side; sim.holder = sh; sh.run = { x: side === 0 ? 0.8 : 0.2, y: y * 0.6 + 0.2 };
+  const t0 = Date.now(); while (Date.now() - t0 < 750 * SPEED) { b.tx = sh.x + dir * 0.014; b.ty = sh.y; b.k = 0.2; await sleep(30); }
+  b.tx = sh.x + dir * 0.014; b.ty = sh.y;
+  sim.holder = null; sim.trail = { x: b.x, y: b.y, t: sim.t }; b.k = 0.26; const gx = side === 0 ? 1 : 0, r = Math.random();
+  if (goal) { b.tx = gx + dir * 0.012; b.ty = 0.5 + (r - 0.5) * 0.07; }
+  else if (e.end === 'saved') { b.tx = gx - dir * 0.03; b.ty = 0.5 + (r - 0.5) * 0.05; }
+  else if (e.end === 'wide') { b.tx = gx + dir * 0.02; b.ty = 0.5 + (r < 0.5 ? -1 : 1) * 0.12; }
+  else { b.tx = sh.x + dir * 0.08; b.ty = sh.y + (r - 0.5) * 0.1; }
+  await sleep(430);
+  if (goal) {
+    sim.flash = 1; roar(true);
+    const s = $('#s' + side); s.textContent = M.score[side]; s.classList.remove('bump'); void s.offsetWidth; s.classList.add('bump');
+    $('#gbt').textContent = `${sur(e.shooter || '')} · ${M.min}'`; const gb = $('#gb'); gb.classList.remove('show'); void gb.offsetWidth; gb.classList.add('show');
+    feed({ min: M.min, text: e.text, type: 'goal' }); hud();
+    await sleep(2300); b.k = 0.1; b.tx = 0.5; b.ty = 0.5; sim.poss = 1 - side; await sleep(500);
+  } else { roar(false); feed({ min: M.min, text: e.text }); await sleep(650); sim.poss = 1 - side; }
+  sh.run = null; b.k = 0.14; sim.holder = nearest(sim.poss); sim.busy = false;
+}
+const FILL = [(c, o) => `${c.name} knock it around in midfield.`, (c, o) => `${c.short} win it back and slow things down.`, (c, o) => `Patient spell from ${c.name}. ${o.short} sit in their shape.`, (c, o) => `${c.short} switch the play, looking for a gap.`, (c, o) => `${o.name} are being made to chase here.`, (c, o) => `${c.short} recycle possession. Nothing on yet.`];
+function filler(side) { const c = [M.home, M.away][side].club, o = [M.home, M.away][1 - side].club; feed({ min: M.min, text: FILL[Math.floor(Math.random() * FILL.length)](c, o), type: 'note' }); }
 async function half(to) {
+  ambience(true);
   while (M.min < to) {
-    const evs = tick(M);
-    $('#clk').textContent = M.min + "'";
-    const att = M.poss[0] >= M.poss[1] ? 0 : 1;
-    let tgt = { x: 500 + (Math.random() - 0.5) * 300, y: 310 + (Math.random() - 0.5) * 300 };
-    for (const e of evs) {
-      const dir = e.side === 0 ? 1 : -1;
-      const laneY = { Left: 0.22, Centre: 0.5, Right: 0.78 }[e.lane];
-      const y = 20 + (e.side === 0 ? laneY : 1 - laneY) * 580;
-      tgt = { x: 500 + dir * 360, y };
-      feed({ min: M.min, text: e.text, type: e.type });
-      if (e.type === 'goal') { $('#s0').textContent = M.score[0]; $('#s1').textContent = M.score[1]; }
-    }
-    render(tgt); stats();
-    await sleep(evs.length ? 900 : 330);
+    const before = M.poss[0], evs = tick(M), side = M.poss[0] > before ? 0 : 1;
+    if (sim.poss !== side) { sim.poss = side; sim.holder = nearest(side); }
+    let v = (sim.mom.length ? sim.mom[sim.mom.length - 1].v : 0) * 0.55 + (side === 0 ? 0.7 : -0.7);
+    for (const e of evs) v += (e.side === 0 ? 1 : -1) * (e.type === 'goal' ? 6 : e.xg * 16);
+    const gl = evs.find((e) => e.type === 'goal'); sim.mom.push({ v, goal: gl ? gl.side : undefined });
+    hud();
+    for (const e of evs) await shotSeq(e);
+    if (!evs.length) { if (M.min % 6 === 3) filler(side); await sleep(300); }
   }
 }
 
 // ---------- half-time ----------
 function halftime() {
-  feed({ min: 45, text: 'Half-time.' });
-  const oppIdx = M.oppIdx, opp = CLUBS[M.oppId];
+  whistle(2); ambience(false); feed({ min: 45, text: 'Half-time.', type: 'note' });
+  const oppIdx = M.oppIdx, opp = CLUBS[M.oppId], me = [M.home, M.away][M.meIdx];
   htPlan = null; talkRes = null;
-  const htP = serv({ action: 'halftime', manager: M.oppId, report: halftimeReport(M, oppIdx) }).then((p) => (htPlan = p)).catch(() => (htPlan = null));
-  const me = [M.home, M.away][M.meIdx];
-  const sit = `${M.home.club.name} ${M.score[0]} - ${M.score[1]} ${M.away.club.name} at half-time. Ashford ${M.score[M.meIdx] > M.score[oppIdx] ? 'are winning' : M.score[M.meIdx] < M.score[oppIdx] ? 'are losing' : 'are level'}. Shots ${M.shots[M.meIdx]}-${M.shots[oppIdx]}.`;
+  const htP = call({ action: 'halftime', manager: M.oppId, report: halftimeReport(M, oppIdx) }).then((p) => (htPlan = p)).catch(() => (htPlan = null));
+  const lead = M.score[M.meIdx] - M.score[oppIdx];
+  const sit = `${M.home.club.name} ${M.score[0]} - ${M.score[1]} ${M.away.club.name} at half-time. Ashford ${lead > 0 ? 'are winning' : lead < 0 ? 'are losing' : 'are level'}. Shots ${M.shots[M.meIdx]}-${M.shots[oppIdx]}.`;
+  const seg = (k, opts) => `<div class="seg" data-k="${k}">${opts.map((o) => `<button class="${me.t[k] === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div>`;
+  const roomHtml = (eff) => me.xi.map((p) => { const e = (eff || []).find((x) => x.name === p.name), r = rat(p); return `<div class="pr"><div class="l1"><b>${esc(p.name)}</b>${e ? `<span class="delta ${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span>` : ''}<span class="pill ${ratCls(r)}">${r.toFixed(1)}</span><span class="pill ${morCls(p.morale)}" title="Morale">M ${p.morale}</span></div><div class="tr">${p.slot} · ${p.age} · ${p.trait}</div>${e ? `<div class="why">${esc(e.reason)}</div>` : ''}</div>`; }).join('');
   const ov = document.createElement('div'); ov.className = 'overlay';
-  ov.innerHTML = `<div class="modal"><div class="mh"><div><div class="small mono">HALF-TIME · ${M.score[0]}–${M.score[1]}</div><div class="cond" style="font-size:28px;font-weight:800">Dressing room</div></div></div>
-    <div class="pb tg">
-      <div><label>YOUR TEAM TALK</label><textarea id="talk" placeholder="Say it like you would in the room."></textarea>
-      <div class="chips">${['Keep doing this. Stay calm and trust the plan.', "That was not good enough. I want more from everyone.", 'Brilliant half. Proud of you. Go and finish it.', 'Forget the score. Win your own battle out there.'].map((t) => `<button>${t}</button>`).join('')}</div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div><label>MENTALITY</label><div class="seg" data-k="mentality">${['Defensive', 'Balanced', 'Attacking'].map((o) => `<button class="${me.t.mentality === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div></div>
-        <div><label>PRESS</label><div class="seg" data-k="press">${['Low', 'Mid', 'High'].map((o) => `<button class="${me.t.press === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div></div>
+  ov.innerHTML = `<div class="obg" style="background-image:url(/img/dressing.jpg)"></div><div class="modal">
+    <div class="mh"><div><div class="small mono">HALF-TIME · ${M.home.club.short} ${M.score[0]}–${M.score[1]} ${M.away.club.short}</div><div class="cond" style="font-size:32px;font-weight:800;line-height:1.1">The dressing room</div></div>
+      <div class="status" id="htstat"><span class="pulse"></span>${opp.manager} is re-thinking next door…</div></div>
+    <div class="mgrid">
+      <div class="tg">
+        <div><label>YOUR TEAM TALK</label><textarea id="talk" placeholder="Say it like you would in the room. Every player takes it their own way."></textarea>
+          <div class="quick">${['Keep doing this. Stay calm and trust the plan.', 'That was not good enough. I want more from everyone.', 'Brilliant half. Proud of you. Go and finish it.', 'Forget the score. Win your own battle out there.'].map((t) => `<button>${t}</button>`).join('')}</div></div>
+        <div class="two"><div><label>MENTALITY</label>${seg('mentality', ['Defensive', 'Balanced', 'Attacking'])}</div><div><label>PRESS</label>${seg('press', ['Low', 'Mid', 'High'])}</div></div>
+        <div><label>ATTACK THROUGH</label>${seg('attack_lane', ['Left', 'Centre', 'Right'])}</div>
+        <button class="btn wide" id="out">Give the talk</button>
       </div>
-      <div><label>ATTACK THROUGH</label><div class="seg" data-k="attack_lane">${['Left', 'Centre', 'Right'].map((o) => `<button class="${me.t.attack_lane === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div></div>
-      <div id="talkres"></div>
-      <button class="btn" id="out">Give the talk</button>
-      <div class="status" style="border:0;padding:0" id="htstat"><span class="pulse"></span>${opp.manager} is re-thinking in the away dressing room…</div>
+      <div><div id="tone" class="tg"><label>THE ROOM · FIRST-HALF RATING · MORALE</label></div><div class="room" id="room">${roomHtml()}</div></div>
     </div></div>`;
   document.body.appendChild(ov);
-  htP.then(() => { const s = $('#htstat'); if (s) s.innerHTML = `<span class="pulse ok"></span>${opp.manager} has made a decision.`; refreshTop(); });
-  ov.querySelectorAll('.chips button').forEach((b) => (b.onclick = () => ($('#talk').value = b.textContent)));
+  htP.then(() => { const s = $('#htstat'); if (s) s.innerHTML = `<span class="pulse ok"></span>${opp.manager} has made a decision.`; });
+  ov.querySelectorAll('.quick button').forEach((b) => (b.onclick = () => ($('#talk').value = b.textContent)));
   ov.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { me.t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); })));
   let given = false;
   $('#out').onclick = async () => {
     if (!given) {
       const text = $('#talk').value.trim() || 'Keep going, lads.';
       $('#out').disabled = true; $('#out').textContent = 'The players are listening…';
-      try {
-        talkRes = await serv({ action: 'talk', text, situation: sit, players: me.xi.map((p) => ({ name: p.name, pos: p.slot, age: p.age, trait: p.trait, morale: p.morale, rating: (p.rating || 6.5).toFixed(1) })) });
-      } catch (e) { talkRes = { tone: 'Unclear', effects: [], room: 'The room is quiet.' }; }
-      for (const ef of talkRes.effects || []) {
-        const d = parseInt(ef.change, 10); const p = me.xi.find((x) => x.name === ef.name);
-        if (p) { p.morale = Math.max(1, Math.min(10, p.morale + d)); p.ref.morale = p.morale; }
-      }
-      $('#talkres').innerHTML = `<div class="small mono" style="margin-bottom:6px">TONE: ${esc(talkRes.tone).toUpperCase()}</div><p style="font-size:14.5px;line-height:1.5;margin-bottom:8px">${esc(talkRes.room)}</p>${(talkRes.effects || []).map((e) => `<div class="eff"><span><b>${esc(e.name)}</b> <span class="small">${esc(e.reason)}</span></span><span class="${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span></div>`).join('')}`;
-      refreshTop(); given = true; $('#out').disabled = false; $('#out').textContent = 'Second half';
+      try { talkRes = await call({ action: 'talk', text, situation: sit, players: me.xi.map((p) => ({ name: p.name, pos: p.slot, age: p.age, trait: p.trait, morale: p.morale, rating: rat(p).toFixed(1) })) }); }
+      catch (e) { talkRes = { tone: 'Unclear', effects: [], room: 'The room is quiet.' }; }
+      for (const ef of talkRes.effects || []) { const p = me.xi.find((x) => x.name === ef.name); if (p) { p.morale = clamp(p.morale + parseInt(ef.change, 10), 1, 10); p.ref.morale = p.morale; } }
+      $('#tone').innerHTML = `<div><div class="tone" style="color:${talkRes.blocked ? 'var(--red)' : 'var(--lime)'}">${talkRes.blocked ? 'Blocked' : esc(talkRes.tone)}</div><p style="font-size:14.5px;line-height:1.5;margin-bottom:10px">${esc(talkRes.room)}</p></div>`;
+      $('#room').innerHTML = roomHtml(talkRes.effects);
+      given = true; $('#out').disabled = false; $('#out').textContent = 'Second half';
       return;
     }
     $('#out').disabled = true; $('#out').textContent = `Waiting for ${opp.manager}…`;
-    await htP;
-    ov.remove();
+    await htP; ov.remove();
     const them = [M.home, M.away][oppIdx];
     if (htPlan) {
       Object.assign(them.t, { formation: htPlan.formation, mentality: htPlan.mentality, press: htPlan.press, attack_lane: htPlan.attack_lane, mark: htPlan.mark });
-      const before = them.xi.map((p) => p.rating); them.xi = pickXI(them.club.squad, htPlan.formation); M.htPlan = htPlan;
-      feed({ min: 45, type: 'serv', html: servCard(opp, htPlan, 'Half-time change') + `<div class="notes" style="margin-top:8px">${htPlan.notes.map((n, i) => `<div class="note"><span class="n">${i + 1}</span><div><div class="s">${esc(n.saw)}</div>${esc(n.decided)}</div></div>`).join('')}</div>` });
+      them.xi = pickXI(them.club.squad, htPlan.formation); M.htPlan = htPlan; layout(oppIdx);
+      $('#rival').innerHTML = planCard(opp, htPlan, 'Changed at half-time');
+      feed({ min: 45, text: `${opp.manager} comes out with ${htPlan.formation}, ${htPlan.mentality.toLowerCase()}, ${htPlan.press.toLowerCase()} press. "${htPlan.quote}"`, type: 'note' });
     }
-    feed({ min: 46, text: 'The second half is under way.' });
+    whistle(1); feed({ min: 46, text: 'The second half is under way.', type: 'note' });
     await half(90);
     fulltime();
   };
@@ -347,48 +541,60 @@ function halftime() {
 
 // ---------- full-time ----------
 function fulltime() {
-  const fx = FIXTURES[state.md], me = M.meIdx, op = M.oppIdx;
-  feed({ min: 90, text: `Full-time: ${M.home.club.name} ${M.score[0]}–${M.score[1]} ${M.away.club.name}.` });
+  whistle(3); ambience(false); sim = null; window.scrollTo(0, 0);
+  const fx = FIXTURES[state.md], me = M.meIdx, op = M.oppIdx, opp = CLUBS[M.oppId], first = opp.manager.split(' ')[0];
   state.results.push([M.home.club.id, M.away.club.id, M.score[0], M.score[1]]);
-  const [o1, o2] = fx.other; const os = quickSim(o1, o2, 900 + state.md);
+  const [o1, o2] = fx.other, os = quickSim(o1, o2, 900 + state.md);
   state.results.push([o1, o2, os[0], os[1]]);
-  const L = M.lanes[me], lt = L.Left + L.Centre + L.Right || 1;
-  const myT = [M.home, M.away][me].t, tot = M.poss[0] + M.poss[1] || 1;
-  state.history.push({ opp: CLUBS[M.oppId].name, score: [M.score[me], M.score[op]], t: { ...myT }, lanePct: `Their attacks went ${Math.round((L.Left / lt) * 100)}% left, ${Math.round((L.Centre / lt) * 100)}% centre, ${Math.round((L.Right / lt) * 100)}% right`, poss: Math.round((M.poss[me] / tot) * 100), shots: M.shots[me], xg: M.xg[me].toFixed(2) });
-  const res = M.score[me] > M.score[op] ? 'WIN' : M.score[me] < M.score[op] ? 'LOSS' : 'DRAW';
-  const opp = CLUBS[M.oppId];
-  const notesHtml = (p, lab) => p ? `<div class="small mono" style="margin:10px 0 6px">${lab}</div><div class="notes">${p.notes.map((n, i) => `<div class="note"><span class="n">${i + 1}</span><div><div class="s">${esc(n.saw)}</div>${esc(n.decided)}</div></div>`).join('')}</div>` : '';
-  const last = state.md === FIXTURES.length - 1;
-  app.innerHTML = topbar() + `<div class="wrap"><div class="end">
-    <div class="panel"><div class="ph">Full-time <span class="mono" style="color:${res === 'WIN' ? 'var(--lime)' : res === 'LOSS' ? 'var(--red)' : 'var(--ink)'}">${res}</span></div>
-      <div class="score"><div class="team"><span class="kit" style="background:${M.home.club.color}"></span>${M.home.club.short}</div><div class="big">${M.score[0]}<span style="color:var(--mute)">–</span>${M.score[1]}</div><div class="team r">${M.away.club.short}<span class="kit" style="background:${M.away.club.color}"></span></div></div>
-      <div class="pb"><div class="small">${M.scorers.map((s) => `${esc(s.name)} ${s.min}'${s.side !== undefined ? ` (${[M.home, M.away][s.side].club.short})` : ''}`).join(' · ') || 'No goals.'}</div>
-      <div class="small" style="margin-top:8px">Elsewhere: ${CLUBS[o1].name} ${os[0]}–${os[1]} ${CLUBS[o2].name}</div></div>
-      <div class="ph" style="border-top:1px solid var(--line)">Table</div><div class="pb">${tableHtml()}</div>
-      <div class="pb"><button class="btn" id="nx">${last ? 'Final standings' : 'Next match'}</button></div>
-    </div>
-    <div class="panel"><div class="ph">${opp.manager}'s notebook</div>
-      <div class="pb"><div style="display:flex;gap:12px;align-items:center"><img src="${IMG[opp.id]}" style="width:56px;height:56px;border-radius:12px;object-fit:cover"><div class="small">Every decision below came from SERV Reasoning, reading the same scouting report and match stats you saw. Each note ties one fact to one change.</div></div>
-      ${notesHtml(M.prePlan, 'BEFORE KICK-OFF')}${notesHtml(M.htPlan, 'AT HALF-TIME')}
-      <div class="small mono" style="margin:12px 0 6px">THE REPORT THEY READ</div><pre class="small mono" style="white-space:pre-wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12px">${esc(M.prePlan.report)}</pre>
+  const L = M.lanes[me], lt = L.Left + L.Centre + L.Right || 1, myT = [M.home, M.away][me].t, tot = M.poss[0] + M.poss[1] || 1;
+  state.history.push({ opp: opp.name, score: [M.score[me], M.score[op]], t: { ...myT }, lanePct: `Their attacks went ${Math.round((L.Left / lt) * 100)}% left, ${Math.round((L.Centre / lt) * 100)}% centre, ${Math.round((L.Right / lt) * 100)}% right`, poss: Math.round((M.poss[me] / tot) * 100), shots: M.shots[me], xg: M.xg[me].toFixed(2) });
+  Object.assign(state.tactics, { mentality: myT.mentality, press: myT.press, attack_lane: myT.attack_lane });
+  const res = M.score[me] > M.score[op] ? 'WIN' : M.score[me] < M.score[op] ? 'DEFEAT' : 'DRAW';
+  const rc = res === 'WIN' ? 'background:var(--lime);color:#0B0E0C' : res === 'DEFEAT' ? 'background:var(--red);color:#fff' : 'background:var(--panel2);color:var(--ink)';
+  const notes = (p, lab) => (p ? `<div class="sec">${lab} · ${p.formation} · ${p.mentality} · ${p.press} press · attack ${p.attack_lane}${p.mark && p.mark !== 'None' ? ' · mark ' + esc(sur(p.mark)) : ''}</div><div class="tl">${p.notes.map((n, i) => `<div class="nt" style="animation-delay:${i * 0.08}s"><div class="s"><span class="k">SAW</span>${esc(n.saw)}</div><div class="d"><span class="k">DECIDED</span>${esc(n.decided)}</div></div>`).join('')}</div>` : '');
+  const all = [...M.home.xi.map((p) => ({ p, c: M.home.club })), ...M.away.xi.map((p) => ({ p, c: M.away.club }))].sort((a, b) => rat(b.p) - rat(a.p)).slice(0, 5);
+  const ph = Math.round((M.poss[0] / tot) * 100), last = state.md === FIXTURES.length - 1;
+  const sc = (side) => M.scorers.filter((s) => s.side === side).map((s) => `${esc(sur(s.name))} ${s.min}'`).join(', ');
+  const strow = (lab, a, b) => `<div class="row"><span class="pill" style="min-width:52px">${a}</span><span class="nm" style="text-align:center;color:var(--mute);font:600 11px 'JetBrains Mono';letter-spacing:.08em">${lab}</span><span class="pill" style="min-width:52px">${b}</span></div>`;
+  app.innerHTML = topbar() + `<div class="wrap">
+    <section class="hero"><div class="hin"><span class="res" style="${rc}">FULL-TIME · ${res}</span>
+      <div class="ft">${crest(M.home.club, 64)}<div style="text-align:right"><h2>${M.home.club.name}</h2><div class="small">${sc(0)}</div></div><div class="n ftscore">${M.score[0]}–${M.score[1]}</div><div style="text-align:left"><h2>${M.away.club.name}</h2><div class="small">${sc(1)}</div></div>${crest(M.away.club, 64)}</div>
+      <div class="small" style="margin-top:8px">Elsewhere: ${CLUBS[o1].name} ${os[0]}–${os[1]} ${CLUBS[o2].name}</div></div></section>
+    <div class="end">
+      <div class="tg">
+        <div class="tile"><div class="th">Match stats <span class="mono" style="font-size:11px">${M.home.club.short} · ${M.away.club.short}</span></div><div class="tb" style="padding:6px 16px">${strow('POSSESSION', ph + '%', 100 - ph + '%')}${strow('SHOTS', M.shots[0], M.shots[1])}${strow('EXPECTED GOALS', M.xg[0].toFixed(2), M.xg[1].toFixed(2))}</div></div>
+        <div class="tile"><div class="th">Best on the pitch</div><div class="tb" style="padding:6px 16px">${all.map(({ p, c }) => `<div class="row">${crest(c, 16)}<span class="nm">${esc(p.name)}</span><span class="pos">${p.slot}</span><span class="pill ${ratCls(rat(p))}">${rat(p).toFixed(1)}</span></div>`).join('')}</div></div>
+        <div class="tile"><div class="th">League table</div><div class="tb" style="padding:8px 14px">${tableHtml()}</div></div>
+        <button class="btn wide" id="nx">${last ? 'Final standings' : 'Next match'}</button>
+      </div>
+      <div class="tile"><div class="th">${opp.manager}'s notebook <span class="mono" style="font-size:11px;color:var(--lime)">SERV REASONING</span></div><div class="tb">
+        <div class="rival"><img src="${IMG[opp.id]}" alt=""><div class="small">Every decision ${first} made in this match, each one tied to the fact that caused it. ${first} read the same report and match stats you can see.</div></div>
+        ${notes(M.prePlan, 'BEFORE KICK-OFF')}${notes(M.htPlan, 'AT HALF-TIME')}
+        <details><summary>The scouting report ${first} was given</summary><pre>${esc(M.prePlan.report)}</pre></details>
       </div></div>
-  </div></div>`;
+    </div></div>`;
+  bindTop();
   $('#nx').onclick = () => { state.md++; last ? season() : prematch(); };
 }
 function season() {
+  window.scrollTo(0, 0);
   const t = table(), pos = t.findIndex((r) => r.id === 'you') + 1;
-  const champ = t[0];
-  const msg = pos === 1 ? 'Three managers tried to out-think you, and none of them managed it.' : pos === 2 ? 'Second. Close, but the board expected the title.' : 'The board has seen enough. Your office has been cleared.';
-  const share = encodeURIComponent(`I finished ${pos}${pos === 1 ? 'st' : pos === 2 ? 'nd' : pos === 3 ? 'rd' : 'th'} in Touchline, a football manager where every rival manager thinks for itself on @openservai SERV Reasoning. Can you win the league? ${location.origin}`);
-  app.innerHTML = topbar() + `<div class="wrap"><div class="panel" style="max-width:720px;margin:0 auto">
-    <div class="ph">Final standings</div><div class="pb">
-    <div class="cond" style="font-size:54px;font-weight:800;line-height:1">${pos === 1 ? 'Champions' : pos + (pos === 2 ? 'nd' : pos === 3 ? 'rd' : 'th') + ' place'}</div>
-    <p style="margin:10px 0 16px;font-size:16px;color:#D5DBD3">${msg}</p>${tableHtml()}
-    <div class="small mono" style="margin-top:14px">${ledger.calls} SERV decisions · $${ledger.cost.toFixed(4)} total · ${ledger.blocked} team talk${ledger.blocked === 1 ? '' : 's'} blocked by Prompt Guard</div>
-    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="https://x.com/intent/post?text=${share}">Share</a><button class="btn ghost" onclick="location.reload()">New season</button></div>
-  </div></div></div>`;
+  const img = pos === 1 ? 'champions' : pos === 2 ? 'tunnel' : 'sacked';
+  const head = pos === 1 ? 'Champions.' : pos === 2 ? 'So close.' : 'Sacked.';
+  const msg = pos === 1 ? 'Three managers studied you, countered you and changed things at half-time. None of them could stop you.' : pos === 2 ? 'Second place. The board wanted the title, and one of those managers read you a little too well.' : `You finished ${ord(pos)}. The board has seen enough, and your office has been cleared.`;
+  const share = encodeURIComponent(`I finished ${ord(pos)} in Touchline, a football manager where every rival manager thinks for itself on @openservai SERV Reasoning. Can you win the league? ${location.origin}`);
+  app.innerHTML = topbar() + `<section class="season" style="background-image:url(/img/${img}.jpg)"><div class="in">
+    <div class="cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:8px">Final standings · ${ord(pos)} place</div>
+    <h1>${head}</h1><p style="margin:14px 0 18px;font-size:17px;line-height:1.5;color:#D5DBD3">${msg}</p>
+    <div class="tile"><div class="tb" style="padding:8px 14px">${tableHtml()}</div></div>
+    <div class="small mono" style="margin-top:12px">${ledger.calls} SERV decisions · $${ledger.cost.toFixed(4)} total · ${ledger.blocked} team talk${ledger.blocked === 1 ? '' : 's'} blocked by Prompt Guard</div>
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><a class="btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=${share}">Share result</a><button class="btn ghost" id="again">New season</button></div>
+  </div></section>`;
+  bindTop(); if (pos === 1) roar(true);
+  $('#again').onclick = () => location.reload();
 }
 title();
+})();
 </script>
 </body>
 </html>
