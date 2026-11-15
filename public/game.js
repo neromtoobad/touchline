@@ -35,10 +35,10 @@ function makeSquad(seed, bias) {
 }
 
 const CLUBS = {
-  you: { id: 'you', name: 'Ashford Town', short: 'ASH', color: '#E8E2D0', ink: '#111', squad: makeSquad(11, { att: 2 }) },
-  blank: { id: 'blank', name: 'Harrow Vale', short: 'HAR', color: '#1D3A6B', ink: '#fff', manager: 'Teodor Blank', tag: 'The Wall', line: 'Pragmatic. Hates conceding. Will sit deep and hit you on the break.', squad: makeSquad(23, { def: 5, att: -2 }) },
-  ortega: { id: 'ortega', name: 'Port Arden', short: 'PAR', color: '#B3261E', ink: '#fff', manager: 'Marisol Ortega', tag: 'Heavy Metal', line: 'Presses like her life depends on it. Takes risks, chases every game.', squad: makeSquad(37, { sta: 8, att: 2 }) },
-  ferrier: { id: 'ferrier', name: 'Kingsmere', short: 'KIN', color: '#2F6B4F', ink: '#fff', manager: 'Duncan Ferrier', tag: 'The Professor', line: 'Studies your habits, then changes shape to punish them.', squad: makeSquad(51, { att: 3, def: 3 }) },
+  you: { id: 'you', name: 'Ashford Town', short: 'ASH', color: '#F4EFE2', ink: '#111', squad: makeSquad(11, { att: 2 }) },
+  blank: { id: 'blank', name: 'Harrow Vale', short: 'HAR', color: '#58B4E8', ink: '#111', manager: 'Teodor Blank', tag: 'The Wall', line: 'Pragmatic. Hates conceding. Will sit deep and hit you on the break.', squad: makeSquad(23, { def: 5, att: -2 }) },
+  ortega: { id: 'ortega', name: 'Port Arden', short: 'PAR', color: '#E0362C', ink: '#fff', manager: 'Marisol Ortega', tag: 'Heavy Metal', line: 'Presses like her life depends on it. Takes risks, chases every game.', squad: makeSquad(37, { sta: 8, att: 2 }) },
+  ferrier: { id: 'ferrier', name: 'Kingsmere', short: 'KIN', color: '#E6B325', ink: '#111', manager: 'Duncan Ferrier', tag: 'The Professor', line: 'Studies your habits, then changes shape to punish them.', squad: makeSquad(51, { att: 3, def: 3 }) },
 };
 const FIXTURES = [
   { opp: 'blank', home: true, other: ['ortega', 'ferrier'] },
