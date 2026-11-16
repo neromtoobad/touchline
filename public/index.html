@@ -221,8 +221,14 @@ input.nm::placeholder,textarea::placeholder{color:rgba(255,255,255,.4)}
 .pm{display:grid;grid-template-columns:240px 1fr;gap:24px;padding:24px}
 .pm .ph{width:240px;height:240px;border-radius:20px;background-color:#2A2F38;background-repeat:no-repeat}
 .pm h3{font:600 40px/1 Geist,sans-serif;letter-spacing:-.05em;margin-top:6px}
+.swap{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.swap label{font:500 11px 'Geist Mono',monospace;color:var(--mute);letter-spacing:.06em;display:block;margin-bottom:10px}
+.swap .opts{display:flex;gap:8px;flex-wrap:wrap}
+.sw{display:flex;align-items:center;gap:8px;background:var(--panel2);border:0;border-radius:999px;padding:5px 12px 5px 5px;font:500 13.5px Geist,sans-serif;letter-spacing:-.01em;cursor:pointer;color:var(--ink);transition:background .15s}
+.sw b{font:500 11.5px 'Geist Mono',monospace;color:var(--mute)}
+#pc{cursor:pointer}
 .dock{display:block}
-@media (hover:hover){.btn:not(:disabled):hover{transform:translateY(-2px)}.pc:hover{transform:translateY(-4px);box-shadow:0 16px 30px -12px rgba(12,12,12,.3)}.sty:hover{transform:translateY(-4px);opacity:1}.seg button:not(.on):hover,.quick button:hover{color:var(--ink)}}
+@media (hover:hover){.sw:hover{background:rgba(255,255,255,.18)}.btn:not(:disabled):hover{transform:translateY(-2px)}.pc:hover{transform:translateY(-4px);box-shadow:0 16px 30px -12px rgba(12,12,12,.3)}.sty:hover{transform:translateY(-4px);opacity:1}.seg button:not(.on):hover,.quick button:hover{color:var(--ink)}}
 @media (max-width:1180px){.hub{grid-template-columns:1fr 1fr}.hub>:last-child{grid-column:1/-1}.cc{grid-template-columns:1fr 320px}.cc>.t-xi{display:none}.fixture .fin{grid-template-columns:1fr auto 1fr}.boss{grid-column:1/-1;width:auto}}
 @media (max-width:820px){
 :root{--r:22px}
@@ -319,7 +325,7 @@ function playerModal(p, buy) {
     <p class="storyp" style="margin:12px 0 14px">${esc(q.story)}</p>
     ${bar('ATTACK', q.att)}${bar('DEFENCE', q.def)}${bar('STAMINA', q.sta)}${bar('MORALE', q.morale * 10)}
     <div class="small" style="margin-top:10px">${q.goals} goal${q.goals === 1 ? '' : 's'} this season · overall ${q.ovr} · value £${val(q)}m</div>
-    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center"><button class="btn sm" id="pmt"></button><button class="btn ghost sm" id="pmx">Close</button><span class="small" id="pmn"></span></div></div></div></div>`;
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center"><button class="btn sm" id="pmt"></button><button class="btn ghost sm" id="pmx">Close</button><span class="small" id="pmn"></span></div><div id="pms"></div></div></div></div>`;
   document.body.appendChild(ov); ov.onclick = (e) => { if (e.target === ov || e.target.id === 'pmx') ov.remove(); };
   const sq = CLUBS.you.squad, bt = ov.querySelector('#pmt'), nt = ov.querySelector('#pmn'), MIN = { GK: 1, DF: 5, MF: 5, FW: 3 }, price = val(q);
   if (buy) {
@@ -329,8 +335,15 @@ function playerModal(p, buy) {
   } else if ($('#ko')) {
     bt.textContent = `Sell for £${price}m`;
     if (sq.filter((x) => x.pos === q.pos).length <= MIN[q.pos]) { bt.disabled = true; nt.textContent = `You need at least ${MIN[q.pos]} ${q.pos}`; }
-    bt.onclick = () => { state.budget += price; sq.splice(sq.indexOf(q), 1); MARKET.push({ ...q, from: 'Ashford Town' }); ov.remove(); drawBoard(); };
+    bt.onclick = () => { state.budget += price; sq.splice(sq.indexOf(q), 1); MARKET.push({ ...q, sel: undefined, from: 'Ashford Town' }); ov.remove(); drawBoard(); };
   } else bt.remove();
+  if (!buy && $('#ko') && sq.includes(q)) {
+    const xi = pickXI(sq, state.tactics.formation).map((x) => x.ref), inXI = xi.includes(q);
+    const opts = sq.filter((x) => x.pos === q.pos && x !== q && xi.includes(x) !== inXI).sort((a, b) => b.ovr - a.ovr), el = ov.querySelector('#pms');
+    el.className = 'swap';
+    el.innerHTML = `<label>${inXI ? 'IN YOUR STARTING ELEVEN · SWAP HIM OUT FOR' : 'ON THE BENCH · BRING HIM IN FOR'}</label><div class="opts">${opts.map((x, i) => `<button class="sw" data-i="${i}">${face(x, 30)}<span>${esc(sur(x.name))}</span><b>${x.ovr}</b></button>`).join('') || `<span class="small">No other ${q.pos} to swap with.</span>`}</div>`;
+    el.querySelectorAll('.sw').forEach((b) => (b.onclick = () => { const o = opts[+b.dataset.i], [a, z] = inXI ? [o, q] : [q, o]; a.sel = 'start'; z.sel = 'bench'; ov.remove(); drawBoard(); }));
+  }
 }
 
 // ---------- sound ----------
@@ -448,7 +461,7 @@ function prematch() {
         <div class="tile"><div class="th">Their dangermen</div><div class="tb">${threats.map((p) => `<div class="row"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><div class="bar" style="max-width:90px"><i style="width:${p.att}%"></i></div><span class="pill">${p.att}</span></div>`).join('')}</div></div>
       </div>
     </div>
-    <div class="tile" style="margin-top:18px"><div class="th">Your squad <span class="mono" style="font-size:11px">TAP A PLAYER FOR HIS STORY</span></div><div class="tb"><div class="squad" id="squad"></div></div></div>
+    <div class="tile" style="margin-top:18px"><div class="th">Your squad <span class="mono" style="font-size:11px">TAP A PLAYER TO SWAP HIM IN OR OUT</span></div><div class="tb"><div class="squad" id="squad"></div></div></div>
     <div class="tile" style="margin-top:18px"><div class="th">Transfer market <span class="mono" style="font-size:12px;color:var(--lime)" id="bud"></span></div><div class="tb"><div class="squad" id="market"></div></div></div>
     </div>`;
   bindTop();
@@ -481,10 +494,11 @@ function drawBoard() {
   g.setLineDash([8, 8]); g.strokeStyle = 'rgba(255,255,255,.75)'; g.beginPath(); g.moveTo(30, py); g.lineTo(W - 30, py); g.stroke(); g.setLineDash([]);
   g.fillStyle = 'rgba(255,255,255,.85)'; g.font = '600 10px Geist Mono, monospace'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText('PRESS LINE', 34, py - 7);
   const sh = t.mentality === 'Attacking' ? -0.035 : t.mentality === 'Defensive' ? 0.035 : 0;
-  const rows = [[1, 0.9], [f.DF, 0.73 + sh], [f.MF, 0.52 + sh], [f.FW, 0.3 + sh]]; let k = 0;
+  const rows = [[1, 0.9], [f.DF, 0.73 + sh], [f.MF, 0.52 + sh], [f.FW, 0.3 + sh]], hits = []; let k = 0;
+  c.onclick = (e) => { const b = c.getBoundingClientRect(), mx = ((e.clientX - b.left) / b.width) * W, my = ((e.clientY - b.top) / b.height) * H, h = hits.find((q) => Math.hypot(q.x - mx, q.y + 8 - my) < 36); if (h) playerModal(h.p); };
   for (const [n, y] of rows) for (let i = 0; i < n; i++, k++) {
     const p = xi[k], x = (0.06 + 0.88 * (i + 1) / (n + 1)) * W, yy = y * H;
-    shirt(g, x, yy, CLUBS.you.color, '#111', k + 1, 1.45);
+    hits.push({ x, y: yy, p }); shirt(g, x, yy, CLUBS.you.color, '#111', k + 1, 1.45);
     g.font = `600 ${nf}px Geist`; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,.55)'; const w = g.measureText(sur(p.name)).width + 12;
     rr(g, x - w / 2, yy + 22, w, nf + 7, 7); g.fill(); g.fillStyle = '#fff'; g.textBaseline = 'middle'; g.fillText(sur(p.name), x, yy + 22 + (nf + 7) / 2 + 0.5);
     g.fillStyle = p.morale >= 8 ? '#3D5BFF' : p.morale >= 6 ? '#DDE5DA' : '#FF5A4E'; g.beginPath(); g.arc(x + 20, yy - 16, 4.5, 0, 7); g.fill();

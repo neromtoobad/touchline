@@ -14,6 +14,9 @@ const FORMS = {
 };
 const TRAITS = ['Leader', 'Hothead', 'Nervous youngster', 'Veteran', 'Flair player', 'Workhorse', 'Quiet professional', 'Joker'];
 const FIRST = ['Luca', 'Mateo', 'Jonas', 'Arlo', 'Kai', 'Theo', 'Rafa', 'Nils', 'Owen', 'Elias', 'Sami', 'Ivo', 'Leon', 'Milo', 'Hugo', 'Tomas', 'Felix', 'Remy', 'Ezra', 'Bram', 'Caio', 'Dario', 'Emil', 'Finn'];
+const MORE_FIRST = ['Anton', 'Casper', 'Dominik', 'Enzo', 'Gabriel', 'Henrik', 'Isak', 'Joel', 'Lorenzo', 'Marek', 'Niko', 'Oskar', 'Pavel', 'Quentin', 'Ruben', 'Stefan', 'Tobias', 'Viktor', 'Wes', 'Xavi', 'Yann', 'Zeno', 'Adrian', 'Andre', 'Cyrus', 'Dane', 'Eamon', 'Florian', 'Goran', 'Idris', 'Jasper', 'Kristof', 'Laurent', 'Marlon', 'Nico', 'Otto'];
+const MORE_LAST = ['Ahlberg', 'Albrecht', 'Aragon', 'Baptiste', 'Baumann', 'Becker', 'Bellamy', 'Bergstrom', 'Bianchi', 'Brandt', 'Calloway', 'Carvalho', 'Cerny', 'Corbett', 'Dalgaard', 'Delacroix', 'Dimitrov', 'Eklund', 'Engel', 'Esposito', 'Fabre', 'Fischer', 'Gallo', 'Garnier', 'Gruber', 'Halvorsen', 'Hartmann', 'Hendry', 'Horvat', 'Iversen', 'Jankowski', 'Jensen', 'Keller', 'Kessler', 'Kowalski', 'Lachance', 'Lambert', 'Larsen', 'Lehmann', 'Lombardi', 'Madsen', 'Maier', 'Marlowe', 'Mercer', 'Molnar', 'Navarro', 'Nilsson', 'Oliveira', 'Olsen', 'Pascal', 'Pellegrini', 'Petrov', 'Pichler', 'Radic', 'Ramos', 'Rasmussen', 'Renard', 'Ricci', 'Rossi', 'Sandoval', 'Santoro', 'Schuster', 'Silva', 'Sorensen', 'Stavros', 'Strand', 'Tavares', 'Thorne', 'Toivonen', 'Ulrich', 'Valente', 'Vasquez', 'Vogel', 'Voss', 'Wagner', 'Weller', 'Winter', 'Ziegler', 'Zubov', 'Ashby', 'Barros', 'Clement', 'Drummond', 'Egan', 'Fontaine', 'Greaves', 'Hallam', 'Ingram', 'Jovic', 'Kendrick', 'Lowry', 'Maddox', 'Norris', 'Pryce', 'Rowan', 'Sinclair', 'Tennant', 'Underhill', 'Whitlock', 'Yates'];
+const TAKEN = new Set(); // surnames already used anywhere in the league, so no two players share one
 const LAST = ['Varga', 'Holt', 'Brennan', 'Okafor', 'Lindqvist', 'Moreau', 'Kovac', 'Seidel', 'Duarte', 'Hayes', 'Novak', 'Castell', 'Reyes', 'Falk', 'Ibsen', 'Marchetti', 'Quinn', 'Sato', 'Vidal', 'Wren', 'Abara', 'Bakker', 'Costa', 'Dunn'];
 
 const STORY_T = {
@@ -32,7 +35,12 @@ function fallbackStory(q, r) {
 }
 function makeSquad(seed, bias) {
   const r = rng(seed), used = new Set(), out = [];
-  const name = () => { let n; do n = `${FIRST[Math.floor(r() * FIRST.length)]} ${LAST[Math.floor(r() * LAST.length)]}`; while (used.has(n)); used.add(n); return n; };
+  const rn = rng(seed * 7919 + 101), F = FIRST.concat(MORE_FIRST), L = LAST.concat(MORE_LAST), firsts = new Set();
+  const name = () => {
+    let n; do n = `${FIRST[Math.floor(r() * FIRST.length)]} ${LAST[Math.floor(r() * LAST.length)]}`; while (used.has(n)); used.add(n); // keeps the stat rolls where they were
+    let f, l; do f = F[Math.floor(rn() * F.length)]; while (firsts.has(f)); do l = L[Math.floor(rn() * L.length)]; while (TAKEN.has(l));
+    firsts.add(f); TAKEN.add(l); return `${f} ${l}`;
+  };
   const plan = [['GK', 2], ['DF', 6], ['MF', 6], ['FW', 3]];
   for (const [pos, n] of plan) for (let i = 0; i < n; i++) {
     const base = 58 + Math.floor(r() * 22) + (i === 0 ? 6 : 0);
@@ -76,10 +84,11 @@ const FIXTURES = [
 function pickXI(squad, formation) {
   const f = FORMS[formation], by = (p) => [...squad].filter((x) => x.pos === p);
   const score = (x) => (x.pos === 'FW' ? x.att : x.pos === 'DF' || x.pos === 'GK' ? x.def : (x.att + x.def) / 2) + x.morale;
-  const gk = by('GK').sort((a, b) => score(b) - score(a))[0];
+  const pri = (x) => (x.sel === 'start' ? 2 : x.sel === 'bench' ? 0 : 1), rank = (a, b) => pri(b) - pri(a) || score(b) - score(a); // your own picks come first
+  const gk = by('GK').sort(rank)[0];
   const xi = [gk];
   for (const pos of ['DF', 'MF', 'FW']) {
-    let pool = by(pos).sort((a, b) => score(b) - score(a));
+    let pool = by(pos).sort(rank);
     let need = f[pos];
     xi.push(...pool.slice(0, need));
     if (pool.length < need) { // borrow from neighbouring lines
