@@ -100,10 +100,10 @@ function pickXI(squad, formation) {
 }
 
 const avg = (a) => a.reduce((s, x) => s + x, 0) / Math.max(a.length, 1);
-function strength(xi, t, fatigue, markedName) {
+function strength(xi, t, fatigue, markedName, min) {
   const f = FORMS[t.formation];
   const mor = (p) => 1 + (p.morale - 6.5) * 0.025;
-  const fat = (p) => 1 - Math.max(0, fatigue - p.sta / 100 * 0.6) * 0.35;
+  const fat = (p) => 1 - Math.max(0, fatigue * (p.on && min ? Math.max(0, min - p.on) / min : 1) - p.sta / 100 * 0.6) * 0.35; // a substitute has only run since he came on
   const line = (slot) => xi.filter((p) => p.slot === slot);
   const attOf = (p) => p.att * mor(p) * fat(p) * (p.name === markedName ? 0.6 : 1);
   let def = avg(line('DF').map((p) => p.def * mor(p) * fat(p))) * 0.8 + avg(line('GK').map((p) => p.def)) * 0.2;
@@ -124,7 +124,7 @@ function newMatch(home, away, seed) {
 function tick(m) {
   const r = m.r; m.min++;
   const fatigue = m.min / 90;
-  const sides = [m.home, m.away].map((s, i) => ({ s, st: strength(s.xi, s.t, fatigue * (s.t.press === 'High' ? 1.4 : s.t.press === 'Low' ? 0.8 : 1), [m.away, m.home][i].t.mark) }));
+  const sides = [m.home, m.away].map((s, i) => ({ s, st: strength(s.xi, s.t, fatigue * (s.t.press === 'High' ? 1.4 : s.t.press === 'Low' ? 0.8 : 1), [m.away, m.home][i].t.mark, m.min) }));
   const p0 = sides[0].st.mid / (sides[0].st.mid + sides[1].st.mid);
   const a = r() < p0 ? 0 : 1, d = 1 - a;
   m.poss[a]++;

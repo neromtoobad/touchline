@@ -227,6 +227,10 @@ input.nm::placeholder,textarea::placeholder{color:rgba(255,255,255,.4)}
 .sw{display:flex;align-items:center;gap:8px;background:var(--panel2);border:0;border-radius:999px;padding:5px 12px 5px 5px;font:500 13.5px Geist,sans-serif;letter-spacing:-.01em;cursor:pointer;color:var(--ink);transition:background .15s}
 .sw b{font:500 11.5px 'Geist Mono',monospace;color:var(--mute)}
 #pc{cursor:pointer}
+.lab{font:500 11.5px 'Geist Mono',monospace;color:var(--mute);letter-spacing:.06em;display:block;margin:14px 0 4px}
+.subb{width:30px;height:30px;border-radius:50%;border:0;background:var(--panel2);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none;transition:background .15s}
+.subb.on{background:var(--ink);color:var(--inv)}
+.subopts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px 42px;animation:up .25s ease both}
 .dock{display:block}
 @media (hover:hover){.sw:hover{background:rgba(255,255,255,.18)}.btn:not(:disabled):hover{transform:translateY(-2px)}.pc:hover{transform:translateY(-4px);box-shadow:0 16px 30px -12px rgba(12,12,12,.3)}.sty:hover{transform:translateY(-4px);opacity:1}.seg button:not(.on):hover,.quick button:hover{color:var(--ink)}}
 @media (max-width:1180px){.hub{grid-template-columns:1fr 1fr}.hub>:last-child{grid-column:1/-1}.cc{grid-template-columns:1fr 320px}.cc>.t-xi{display:none}.fixture .fin{grid-template-columns:1fr auto 1fr}.boss{grid-column:1/-1;width:auto}}
@@ -587,7 +591,7 @@ function hud() {
   const row = (lab, a, b, fa, fb) => { const t = fa + fb || 1; return `<div class="st"><em>${lab}</em><span>${a}</span><div class="split"><i style="width:${(fa / t) * 100}%;background:${hc}"></i><i style="flex:1;background:${ac}"></i></div><span style="text-align:right">${b}</span></div>`; };
   $('#stats').innerHTML = row('POSSESSION', ph + '%', 100 - ph + '%', ph, 100 - ph) + row('SHOTS', M.shots[0], M.shots[1], M.shots[0] || 0.5, M.shots[1] || 0.5) + row('EXPECTED GOALS', M.xg[0].toFixed(2), M.xg[1].toFixed(2), M.xg[0] || 0.05, M.xg[1] || 0.05);
   const me = [M.home, M.away][M.meIdx], pf = me.t.press === 'High' ? 1.35 : me.t.press === 'Low' ? 0.8 : 1;
-  $('#xi').innerHTML = me.xi.map((p, i) => { const cond = clamp(Math.round(100 - M.min * (1.3 - p.sta / 100) * 0.62 * pf), 30, 100), r = rat(p); return `<div class="row" style="padding:5px 0">${face(p, 28)}<span class="nm">${esc(sur(p.name))}</span><div class="bar" style="max-width:50px"><i style="width:${cond}%;background:${cond > 75 ? '#121316' : cond > 55 ? '#E69A00' : '#E5341D'}"></i></div><span class="pill ${ratCls(r)}">${r.toFixed(1)}</span></div>`; }).join('');
+  $('#xi').innerHTML = me.xi.map((p, i) => { const cond = clamp(Math.round(100 - (M.min - (p.on || 0)) * (1.3 - p.sta / 100) * 0.62 * pf), 30, 100), r = rat(p); return `<div class="row" style="padding:5px 0">${face(p, 28)}<span class="nm">${esc(sur(p.name))}</span><div class="bar" style="max-width:50px"><i style="width:${cond}%;background:${cond > 75 ? '#121316' : cond > 55 ? '#E69A00' : '#E5341D'}"></i></div><span class="pill ${ratCls(r)}">${r.toFixed(1)}</span></div>`; }).join('');
   const sc = (side) => M.scorers.filter((s) => s.side === side).map((s) => `${sur(s.name)} ${s.min}'`).join(', ');
   $('#sc0').textContent = sc(0); $('#sc1').textContent = sc(1);
   drawMom();
@@ -676,7 +680,11 @@ function halftime() {
   const lead = M.score[M.meIdx] - M.score[oppIdx];
   const sit = `${M.home.club.name} ${M.score[0]} - ${M.score[1]} ${M.away.club.name} at half-time. Ashford ${lead > 0 ? 'are winning' : lead < 0 ? 'are losing' : 'are level'}. Shots ${M.shots[M.meIdx]}-${M.shots[oppIdx]}.`;
   const seg = (k, opts) => `<div class="seg" data-k="${k}">${opts.map((o) => `<button class="${me.t[k] === o ? 'on' : ''}" data-v="${o}">${o}</button>`).join('')}</div>`;
-  const roomHtml = (eff) => me.xi.map((p) => { const e = (eff || []).find((x) => x.name === p.name), r = rat(p); return `<div class="pr"><div class="l1">${face(p, 34)}<b>${esc(p.name)}</b>${e ? `<span class="delta ${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span>` : ''}<span class="pill ${ratCls(r)}">${r.toFixed(1)}</span><span class="pill ${morCls(p.morale)}" title="Morale">M ${p.morale}</span></div><div class="tr">${p.slot} · ${p.age} · ${p.trait}</div>${e ? `<div class="why">${esc(e.reason)}</div>` : ''}</div>`; }).join('');
+  let subsLeft = 3, subOpen = -1, lastEff = null; const offNames = [];
+  const SWAP = '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 5.5h9.5M10 3l2.5 2.5L10 8M13 10.5H3.5M6 8l-2.5 2.5L6 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const benchFor = (p) => { const used = me.xi.map((x) => x.ref), b = CLUBS.you.squad.filter((x) => !used.includes(x) && !offNames.includes(x.name)), same = b.filter((x) => x.pos === p.slot || x.pos === p.pos); return (same.length || p.slot === 'GK' ? same : b.filter((x) => x.pos !== 'GK')).sort((a, c) => c.ovr - a.ovr); };
+  const roomHtml = (eff) => me.xi.map((p, i) => { const e = (eff || []).find((x) => x.name === p.name), r = rat(p), opts = subOpen === i ? benchFor(p) : null; return `<div class="pr"><div class="l1">${face(p, 34)}<b>${esc(p.name)}</b>${p.on ? '<span class="delta up">ON</span>' : ''}${e ? `<span class="delta ${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span>` : ''}<span class="pill ${ratCls(r)}">${r.toFixed(1)}</span><span class="pill ${morCls(p.morale)}" title="Morale">M ${p.morale}</span>${subsLeft > 0 && !p.on ? `<button class="subb ${subOpen === i ? 'on' : ''}" data-i="${i}" aria-label="Substitute ${esc(p.name)}">${SWAP}</button>` : ''}</div><div class="tr">${p.slot} · ${p.age} · ${p.trait}</div>${e ? `<div class="why">${esc(e.reason)}</div>` : ''}${opts ? `<div class="subopts">${opts.map((x, k) => `<button class="sw" data-k="${k}">${face(x, 30)}<span>${esc(sur(x.name))}</span><b>${x.pos} ${x.ovr}</b></button>`).join('') || '<span class="small">Nobody on the bench can play there.</span>'}</div>` : ''}</div>`; }).join('');
+  const drawRoom = () => { $('#room').innerHTML = roomHtml(lastEff); $('#subl').textContent = subsLeft ? `SUBSTITUTIONS · ${subsLeft} LEFT · TAP THE ARROWS ON A PLAYER` : 'SUBSTITUTIONS · ALL THREE USED'; };
   const ov = document.createElement('div'); ov.className = 'overlay';
   ov.innerHTML = `<div class="obg" style="background-image:url(/img/dressing.jpg)"></div><div class="modal">
     <div class="mh"><div><div class="small mono">HALF-TIME · ${M.home.club.short} ${M.score[0]}–${M.score[1]} ${M.away.club.short}</div><div class="cond" style="font-size:30px;line-height:1.1;margin-top:4px">The dressing room</div></div>
@@ -687,13 +695,23 @@ function halftime() {
           <div class="quick">${['Keep doing this. Stay calm and trust the plan.', 'That was not good enough. I want more from everyone.', 'Brilliant half. Proud of you. Go and finish it.', 'Forget the score. Win your own battle out there.'].map((t) => `<button>${t}</button>`).join('')}</div></div>
         <div class="two"><div><label>MENTALITY</label>${seg('mentality', ['Defensive', 'Balanced', 'Attacking'])}</div><div><label>PRESS</label>${seg('press', ['Low', 'Mid', 'High'])}</div></div>
         <div><label>ATTACK THROUGH</label>${seg('attack_lane', ['Left', 'Centre', 'Right'])}</div>
+        <div class="hint">You have three substitutions. Tap the arrows next to a player in the room to bring someone on with fresh legs.</div>
       </div>
-      <div><div id="tone" class="tg"><label>THE ROOM · FIRST-HALF RATING · MORALE</label></div><div class="room" id="room">${roomHtml()}</div></div>
+      <div><div id="tone" class="tg"><label>THE ROOM · FIRST-HALF RATING · MORALE</label></div><span class="lab" id="subl">SUBSTITUTIONS · 3 LEFT · TAP THE ARROWS ON A PLAYER</span><div class="room" id="room">${roomHtml()}</div></div>
     </div><div class="mf"><button class="btn wide" id="out">Give the talk</button></div></div>`;
   document.body.appendChild(ov);
   htP.then(() => { const s = $('#htstat'); if (s) s.innerHTML = `<span class="pulse ok"></span>${opp.manager} has made a decision.`; });
   ov.querySelectorAll('.quick button').forEach((b) => (b.onclick = () => ($('#talk').value = b.textContent)));
   ov.querySelectorAll('.seg').forEach((s) => s.querySelectorAll('button').forEach((b) => (b.onclick = () => { me.t[s.dataset.k] = b.dataset.v; s.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); })));
+  $('#room').onclick = (e) => {
+    const sb = e.target.closest('.subb'), sw = e.target.closest('.sw');
+    if (sb) { const i = +sb.dataset.i; subOpen = subOpen === i ? -1 : i; drawRoom(); }
+    else if (sw && subOpen >= 0) {
+      const out = me.xi[subOpen], b = benchFor(out)[+sw.dataset.k]; if (!b) return;
+      offNames.push(out.name); me.xi[subOpen] = { ...b, slot: out.slot, side: out.side, ref: b, on: 45 }; subsLeft--; subOpen = -1;
+      layout(M.meIdx); hud(); feed({ min: 45, text: `Substitution for Ashford: ${b.name} on for ${out.name}.`, type: 'note' }); drawRoom();
+    }
+  };
   let given = false;
   $('#out').onclick = async () => {
     if (!given) {
@@ -703,7 +721,7 @@ function halftime() {
       catch (e) { talkRes = { tone: 'Unclear', effects: [], room: 'The room is quiet.' }; }
       for (const ef of talkRes.effects || []) { const p = me.xi.find((x) => x.name === ef.name); if (p) { p.morale = clamp(p.morale + parseInt(ef.change, 10), 1, 10); p.ref.morale = p.morale; } }
       $('#tone').innerHTML = `<div><div class="tone" style="color:${talkRes.blocked ? 'var(--red)' : 'var(--lime)'}">${talkRes.blocked ? 'Blocked' : esc(talkRes.tone)}</div><p style="font-size:14.5px;line-height:1.5;margin-bottom:10px">${esc(talkRes.room)}</p></div>`;
-      $('#room').innerHTML = roomHtml(talkRes.effects);
+      lastEff = talkRes.effects; drawRoom();
       given = true; $('#out').disabled = false; $('#out').textContent = 'Second half';
       if (innerWidth <= 820) $('#tone').scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
