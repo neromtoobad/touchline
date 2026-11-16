@@ -2,210 +2,281 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#EEEDE8">
 <title>Touchline</title>
 <meta name="description" content="A football management game where every rival manager thinks for itself. Three matches, three managers on SERV Reasoning who scout you, counter you and change shape at half-time.">
 <meta property="og:title" content="Touchline: out-think three AI managers">
 <meta property="og:description" content="Every rival manager scouts you, picks a counter-plan and adapts at half-time, on SERV Reasoning.">
 <meta property="og:image" content="https://touchline.nerom.site/img/tunnel.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230B0E0C%22/%3E%3Cpath d=%22M6 22h20%22 stroke=%22%23C6F432%22 stroke-width=%224%22/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230B0E0C%22/%3E%3Cpath d=%22M6 22h20%22 stroke=%22%23FFFFFF%22 stroke-width=%224%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/img/stadium.jpg">
 <style>
-:root{--bg:#F3F0E9;--panel:#FFFFFF;--panel2:#F1EEE6;--line:#E3DED2;--ink:#121316;--mute:#6D727B;--lime:#3D5BFF;--red:#E5341D;--amber:#E69A00}
-.title,.overlay,.season,.fixture,.hero,.setup{--ink:#F5F4EF;--mute:#B4BAC0;--line:rgba(255,255,255,.16);--panel:rgba(13,15,18,.86);--panel2:rgba(255,255,255,.09);--lime:#6E86FF;color:var(--ink)}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit}
-.cond{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.02em}
-.mono{font-family:'JetBrains Mono',monospace}
+:root{--bg:#EEEDE8;--panel:#FFFFFF;--panel2:#F4F3EE;--line:rgba(12,12,12,.1);--ink:#0C0C0C;--inv:#FFFFFF;--mute:#6B6B66;--lime:#3D5BFF;--red:#E5341D;--amber:#E69A00;--r:24px;--sh:0 1px 2px rgba(12,12,12,.04),0 18px 40px -22px rgba(12,12,12,.18)}
+.title,.overlay,.season,.fixture,.hero,.setup{--ink:#F6F5F1;--inv:#0C0C0C;--mute:#A9ABA6;--line:rgba(255,255,255,.14);--panel:rgba(14,15,17,.82);--panel2:rgba(255,255,255,.08);--lime:#8C9FFF;color:var(--ink)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+html,body{background:var(--bg);color:var(--ink);font-family:Geist,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font:inherit;color:inherit;touch-action:manipulation}
+.cond{font-family:Geist,system-ui,sans-serif;letter-spacing:-.04em;font-weight:600}
+.mono{font-family:'Geist Mono',ui-monospace,monospace}
 .small{font-size:13.5px;color:var(--mute);line-height:1.5}
+.eyebrow{font:500 12px 'Geist Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);display:flex;align-items:center;gap:8px}
+.eyebrow:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime)}
 @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes pl{50%{opacity:.25}}
 @keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}
-.top{display:flex;align-items:center;gap:18px;padding:12px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(243,240,233,.88);backdrop-filter:blur(12px);z-index:5}
-.brand{font:800 24px 'Barlow Condensed';letter-spacing:.06em}.brand i{color:var(--lime);font-style:normal}
-.pips{display:flex;align-items:center;gap:6px;margin-right:auto;font:600 12px 'JetBrains Mono';color:var(--mute)}
-.pips span{width:22px;height:5px;border-radius:3px;background:var(--line)}.pips span.done{background:var(--ink)}.pips span.now{background:var(--lime)}
+.top{display:flex;align-items:center;gap:14px;padding:9px 10px 9px 18px;margin:10px 14px 0;border:1px solid var(--line);border-radius:999px;position:sticky;top:10px;background:rgba(255,255,255,.78);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);z-index:5;box-shadow:var(--sh)}
+.brand{font:600 18px Geist,sans-serif;letter-spacing:-.04em;display:flex;align-items:center;gap:8px}
+.brand span{width:18px;height:18px;border-radius:6px;background:var(--ink);position:relative;flex:none}.brand span:after{content:"";position:absolute;left:4px;right:4px;bottom:5px;height:2px;border-radius:2px;background:#fff}
+.pips{display:flex;align-items:center;gap:5px;margin-right:auto;font:500 12px 'Geist Mono',monospace;color:var(--mute)}
+.pips span{width:18px;height:4px;border-radius:3px;background:rgba(12,12,12,.12)}.pips span.done{background:var(--ink)}.pips span.now{background:var(--lime)}
 .pips em{font-style:normal;margin-left:6px}
-.servchip{display:flex;align-items:center;gap:12px;font:12px 'JetBrains Mono';color:var(--mute);border:1px solid var(--line);border-radius:30px;padding:7px 14px;background:#fff}
-.servchip b{color:var(--ink);font-weight:600}.servchip .dot{width:8px;height:8px;border-radius:50%;background:var(--lime)}
-.servchip.busy{border-color:var(--amber)}.servchip.busy .dot{background:var(--amber);animation:pl .8s infinite}
-.snd{background:transparent;border:1px solid var(--line);border-radius:30px;padding:7px 12px;font:600 12px 'JetBrains Mono';color:var(--mute);cursor:pointer}
-.wrap{max-width:1400px;margin:0 auto;padding:20px 22px 40px;animation:up .45s ease both}
-.title{position:relative;min-height:100vh;display:flex;align-items:flex-end;overflow:hidden}
+.servchip{display:flex;align-items:center;gap:12px;font:500 12px 'Geist Mono',monospace;color:var(--mute);border-radius:999px;padding:9px 14px;background:var(--panel2);white-space:nowrap}
+.servchip b{color:var(--ink);font-weight:600}.servchip i{font-style:normal}.servchip .dot{width:7px;height:7px;border-radius:50%;background:var(--lime);flex:none}
+.servchip.busy .dot{background:var(--amber);animation:pl .8s infinite}
+.snd{background:var(--ink);border:0;border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:#fff;flex:none}
+.snd svg{width:16px;height:16px}.snd.off{background:var(--panel2);color:var(--mute)}
+.wrap{max-width:1400px;margin:0 auto;padding:16px 14px 44px;animation:fade .45s ease both}
+.title{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden}
 .title .bgi{position:absolute;inset:0;background:url(/img/tunnel.jpg) center/cover;animation:kb 9s ease-out both}
-.title:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,10,.05) 0%,rgba(6,8,10,.3) 45%,rgba(6,8,10,.97) 100%)}
-.title .in{position:relative;z-index:1;padding:48px;max-width:880px}
+.title:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,10,.1) 0%,rgba(6,8,10,.35) 40%,rgba(6,8,10,.96) 100%)}
+.title .in{position:relative;z-index:1;padding:56px;max-width:900px;width:100%;min-width:0}
 .title .in>*{animation:up .7s ease both}.title .in>*:nth-child(2){animation-delay:.12s}.title .in>*:nth-child(3){animation-delay:.24s}.title .in>*:nth-child(4){animation-delay:.36s}.title .in>*:nth-child(5){animation-delay:.48s}
-.title h1{font:800 clamp(64px,11vw,148px)/.86 'Barlow Condensed';text-transform:uppercase}
-.title h1 i{color:var(--lime);font-style:normal}
-.title p{font-size:19px;line-height:1.5;color:#D5DBD3;margin:16px 0 26px;max-width:620px}
-.mgrs{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap}
-.mgr{display:flex;align-items:center;gap:10px;background:rgba(16,20,23,.78);border:1px solid var(--line);border-radius:14px;padding:8px 14px 8px 8px;backdrop-filter:blur(6px)}
-.mgr img{width:44px;height:44px;border-radius:10px;object-fit:cover}
-.mgr b{display:block;font-size:14px}.mgr span{font-size:12px;color:var(--mute)}
-.btn{appearance:none;border:0;background:var(--lime);color:#fff;font:700 20px 'Barlow Condensed';letter-spacing:.06em;text-transform:uppercase;padding:14px 28px;border-radius:12px;cursor:pointer;transition:transform .12s,box-shadow .12s;box-shadow:0 8px 30px rgba(61,91,255,.18);text-decoration:none;display:inline-block}
-.btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(61,91,255,.3)}.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none}
-.btn.wide{width:100%;text-align:center}
-.tile{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 1px 0 rgba(20,20,30,.03),0 10px 30px rgba(20,20,30,.06)}
-.th{padding:13px 16px;border-bottom:1px solid var(--line);font:700 14px 'Barlow Condensed';letter-spacing:.1em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
-.tb{padding:16px}
-.fixture{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);margin-bottom:18px;background:url(/img/stadium.jpg) center 62%/cover}
-.fixture:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,9,12,.9) 0%,rgba(8,9,12,.5) 45%,rgba(8,9,12,.88) 100%)}
-.fixture .fin{position:relative;display:grid;grid-template-columns:1fr auto 1fr auto;gap:22px;align-items:center;padding:22px 26px}
-.side{display:flex;align-items:center;gap:14px}.side.r{justify-content:flex-end;text-align:right}
-.side h2{font:800 38px/1 'Barlow Condensed';text-transform:uppercase}
-.side span{font:600 12px 'JetBrains Mono';color:var(--mute)}
-.vs{text-align:center}.vs b{display:block;font:800 30px 'Barlow Condensed';color:var(--lime)}.vs span{font:600 11px 'JetBrains Mono';color:var(--mute);letter-spacing:.08em}
-.boss{display:flex;gap:12px;align-items:center;background:rgba(16,20,23,.8);border:1px solid var(--line);border-radius:16px;padding:10px 16px 10px 10px;width:380px}
-.boss img{width:74px;height:74px;border-radius:12px;object-fit:cover;flex:none}
-.boss b{font-size:16px}.boss em{font:500 12.5px/1.4 Inter;color:var(--mute);font-style:normal;display:block;margin:2px 0 6px}
+.title h1{font:600 clamp(46px,9.4vw,128px)/.94 Geist,sans-serif;letter-spacing:-.055em;margin-top:14px}
+.title h1 i{color:#A9ABA6;font-style:normal}
+.title p{font-size:18px;line-height:1.55;color:#D6D6D1;margin:20px 0 26px;max-width:600px}
+.mgrs{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+.mgr{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.09);border:1px solid var(--line);border-radius:999px;padding:6px 16px 6px 6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mgr img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.mgr b{display:block;font-size:14px;font-weight:600;letter-spacing:-.01em}.mgr span{font-size:12px;color:var(--mute)}
+.btn{appearance:none;border:0;background:var(--ink);color:var(--inv);font:600 15px Geist,sans-serif;letter-spacing:-.01em;padding:0 26px;height:52px;border-radius:999px;cursor:pointer;transition:transform .15s,opacity .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap}
+.btn:after{content:"";width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);opacity:.7}
+.btn:disabled{opacity:.45;cursor:default}.btn:disabled:after{display:none}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}.btn.ghost:after{display:none}
+.btn.sm{height:42px;padding:0 20px;font-size:14px}
+.btn.wide{width:100%}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.th{padding:16px 18px 12px;font:500 12px 'Geist Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.th>span{text-align:right}
+.tb{padding:4px 18px 18px}
+.photo{background-color:#16181C;background-size:cover;background-blend-mode:luminosity}
+.fixture{position:relative;border-radius:28px;overflow:hidden;margin-bottom:14px;background-image:url(/img/stadium.jpg);background-position:center 62%}
+.fixture:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,9,12,.86) 0%,rgba(8,9,12,.42) 45%,rgba(8,9,12,.84) 100%)}
+.fixture .fin{position:relative;display:grid;grid-template-columns:1fr auto 1fr auto;gap:24px;align-items:center;padding:26px 28px}
+.side{display:flex;align-items:center;gap:16px}.side.r{justify-content:flex-end;text-align:right}
+.side h2{font:600 34px/1 Geist,sans-serif;letter-spacing:-.045em}
+.side span{font:500 11.5px 'Geist Mono',monospace;color:var(--mute);letter-spacing:.06em;display:block;margin-top:6px}
+.vs{text-align:center}.vs b{display:block;font:500 13px 'Geist Mono',monospace;color:var(--ink);width:44px;height:44px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;margin:8px auto 0;background:rgba(255,255,255,.06)}.vs span{font:500 11px 'Geist Mono',monospace;color:var(--mute);letter-spacing:.08em}
+.boss{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:22px;padding:10px 18px 10px 10px;width:390px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.boss img{width:76px;height:76px;border-radius:16px;object-fit:cover;flex:none}
+.boss b{font-size:16px;font-weight:600;letter-spacing:-.02em}.boss em{font:400 12.5px/1.4 Geist,sans-serif;color:var(--mute);font-style:normal;display:block;margin:2px 0 7px}
 .status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
-.pulse{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pl 1s infinite;flex:none}.pulse.ok{background:var(--lime);animation:none}
-.hub{display:grid;grid-template-columns:1.05fr 1fr .85fr;gap:18px;align-items:start}
-.tg{display:grid;gap:16px}
-.tg label{font:600 11px 'JetBrains Mono';color:var(--mute);display:block;margin-bottom:7px;letter-spacing:.08em}
-.seg{display:flex;flex-wrap:wrap;gap:6px}
-.seg button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font:600 14px Inter;cursor:pointer;transition:all .12s}
-.seg button:hover{border-color:var(--mute)}
-.seg button.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px;font:600 14px Inter;width:100%}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pl 1s infinite;flex:none}.pulse.ok{background:var(--lime);animation:none}
+.hub{display:grid;grid-template-columns:1.05fr 1fr .85fr;gap:14px;align-items:start}
+.tg{display:grid;gap:14px}
+.tg label{font:500 11.5px 'Geist Mono',monospace;color:var(--mute);display:block;margin-bottom:8px;letter-spacing:.06em}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;background:var(--panel2);border-radius:14px;padding:4px}
+.seg button{background:transparent;border:0;border-radius:11px;padding:10px 4px;font:500 13.5px Geist,sans-serif;letter-spacing:-.01em;cursor:pointer;transition:background .15s,color .15s;color:var(--mute);white-space:nowrap}
+.seg button.on{background:var(--ink);color:var(--inv);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+select{appearance:none;-webkit-appearance:none;background:var(--panel2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236B6B66' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 16px center;color:var(--ink);border:0;border-radius:14px;padding:14px 16px;font:500 15px Geist,sans-serif;width:100%}
 canvas{display:block;width:100%;height:auto}
-.hint{font-size:13px;color:var(--mute);line-height:1.45;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
-.tbl td,.tbl th{padding:8px 5px;text-align:right;border-bottom:1px solid var(--line)}
+.board{margin:0 10px 10px;border-radius:18px;overflow:hidden}
+.hint{font-size:13px;color:var(--mute);line-height:1.5;background:var(--panel2);border-radius:14px;padding:12px 14px}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.tbl td,.tbl th{padding:9px 5px;text-align:right;border-bottom:1px solid var(--line)}
 .tbl tr:last-child td{border-bottom:0}
-.tbl th{font:600 11px 'JetBrains Mono';color:var(--mute)}
+.tbl th{font:500 11px 'Geist Mono',monospace;color:var(--mute);position:sticky;top:0;background:var(--panel)}
+.tbl td:first-child,.tbl th:first-child{color:var(--mute);width:26px;text-align:left}
 .tbl td:nth-child(2),.tbl th:nth-child(2){text-align:left}
-.tbl td:nth-child(2) div{display:flex;align-items:center;gap:8px}
-.tbl tr.me td{color:var(--lime);font-weight:600}
-.bar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--ink);border-radius:3px}
-.row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}.row:last-child{border-bottom:0}
-.row .pos{font:600 11px 'JetBrains Mono';color:var(--mute);width:22px}.row .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pill{font:600 11.5px 'JetBrains Mono';padding:3px 7px;border-radius:6px;background:var(--panel2);min-width:34px;text-align:center}
-.pill.g{background:#E2E8FF;color:#2437C9}.pill.b{background:#FDE4DF;color:#C2290F}
-.sb{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;padding:16px 24px}
-.sb .tm{display:flex;align-items:center;gap:14px}.sb .tm.r{justify-content:flex-end;text-align:right}
-.sb h3{font:800 30px/1 'Barlow Condensed';text-transform:uppercase}
-.sb .sc{font:12.5px Inter;color:var(--mute);margin-top:4px;min-height:17px}
-.big{font:800 64px/1 'Barlow Condensed';display:flex;gap:14px;align-items:center;justify-content:center}
-.big span{min-width:38px;text-align:center;display:inline-block}.big .bump{animation:bump .6s ease}
-@keyframes bump{30%{transform:scale(1.5);color:var(--lime)}}
-.clock{font:600 14px 'JetBrains Mono';color:var(--lime);text-align:center;margin-top:2px}
-.prog{position:absolute;left:0;bottom:0;height:3px;background:var(--lime);transition:width .3s linear}
-.cc{display:grid;grid-template-columns:270px 1fr 340px;gap:18px;margin-top:18px;align-items:start}
-.pitchbox{position:relative}
+.tbl td:nth-child(2) div{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tbl tr.me td{background:var(--panel2);font-weight:600;color:var(--ink)}.tbl tr.me td:first-child{border-radius:10px 0 0 10px;color:var(--lime)}.tbl tr.me td:last-child{border-radius:0 10px 10px 0}
+.season .tbl th{background:transparent;position:static}
+.bar{height:5px;border-radius:3px;background:var(--panel2);overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--ink);border-radius:3px}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}.row:last-child{border-bottom:0}
+.row .pos{font:500 11px 'Geist Mono',monospace;color:var(--mute);width:22px}.row .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font:500 11.5px 'Geist Mono',monospace;padding:4px 8px;border-radius:999px;background:var(--panel2);min-width:36px;text-align:center;font-variant-numeric:tabular-nums}
+.pill.g{background:#E3E8FF;color:#2437C9}.pill.b{background:#FDE4DF;color:#C2290F}
+.sb{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;padding:20px 26px 22px}
+.tm{display:flex;align-items:center;gap:14px;min-width:0}.tm.r{justify-content:flex-end;text-align:right}
+.sb h3{font:600 26px/1.05 Geist,sans-serif;letter-spacing:-.04em}
+.sb .sc{font:400 12.5px Geist,sans-serif;color:var(--mute);margin-top:5px;min-height:17px}
+.big{font:600 60px/1 Geist,sans-serif;letter-spacing:-.05em;display:flex;gap:12px;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.big span{min-width:36px;text-align:center;display:inline-block}.big .bump{animation:bump .6s ease}
+@keyframes bump{30%{transform:scale(1.45);color:var(--lime)}}
+.clock{font:500 12px 'Geist Mono',monospace;color:var(--ink);text-align:center;margin:6px auto 0;background:var(--panel2);border-radius:999px;padding:4px 10px;width:max-content;display:flex;align-items:center;gap:6px}
+.clock:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red);animation:pl 1.2s infinite}
+.prog{position:absolute;left:0;bottom:0;height:3px;background:var(--ink);transition:width .3s linear}
+.cc{display:grid;grid-template-columns:270px 1fr 340px;gap:14px;margin-top:14px;align-items:start}
+.pitchbox{position:relative;border:0}
 .goalban{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0}
 .goalban.show{animation:gb 2.3s ease both}
 @keyframes gb{0%{opacity:0;transform:scale(.7)}12%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.06)}}
 .goalban div{text-align:center;text-shadow:0 6px 40px rgba(0,0,0,.8)}
-.goalban b{display:block;font:800 150px/.85 'Barlow Condensed';letter-spacing:.02em;color:#fff}
-.goalban span{font:700 30px 'Barlow Condensed';text-transform:uppercase;letter-spacing:.06em;background:var(--lime);color:#fff;padding:4px 14px;border-radius:8px;text-shadow:none}
-.feed{max-height:330px;overflow:auto;padding:10px 14px;display:flex;flex-direction:column;gap:7px}
+.goalban b{display:block;font:700 clamp(64px,13vw,150px)/.9 Geist,sans-serif;letter-spacing:-.06em;color:#fff}
+.goalban span{font:500 clamp(11px,1.6vw,15px) 'Geist Mono',monospace;text-transform:uppercase;letter-spacing:.08em;background:#fff;color:#0C0C0C;padding:6px 14px;border-radius:999px;text-shadow:none;display:inline-block;margin-top:10px}
+.feed{max-height:330px;overflow:auto;padding:0 18px 16px;display:flex;flex-direction:column;gap:8px}
 .ev{font-size:13.5px;line-height:1.45;display:grid;grid-template-columns:34px 1fr;gap:8px;animation:up .3s ease both}
-.ev .m{font:600 12px 'JetBrains Mono';color:var(--mute);padding-top:1px}
-.ev.goal{background:var(--ink);border-radius:10px;padding:8px 10px;color:var(--panel);font-weight:700}.ev.goal .m{color:#9AA0AA}
+.ev .m{font:500 12px 'Geist Mono',monospace;color:var(--mute);padding-top:1px}
+.ev.goal{background:var(--ink);border-radius:14px;padding:10px 12px;color:var(--inv);font-weight:600}.ev.goal .m{color:#9AA0AA}
 .ev.note{color:var(--mute)}
 .rival{display:flex;gap:12px;align-items:center}
-.rival img{width:62px;height:62px;border-radius:12px;object-fit:cover;flex:none}
+.rival img{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none}
+.rival b{font-weight:600;letter-spacing:-.02em}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{font:600 12px 'JetBrains Mono';background:var(--panel2);border:1px solid var(--line);padding:5px 8px;border-radius:7px}
-.chip.l{border-color:var(--lime);color:var(--lime)}
-.quote{font:600 21px/1.25 'Barlow Condensed';border-left:3px solid var(--lime);padding-left:12px;margin-top:12px}
-.st{display:grid;grid-template-columns:48px 1fr 48px;gap:10px;align-items:center;font:600 13px 'JetBrains Mono';margin-bottom:10px}
-.st em{grid-column:1/-1;font:600 10.5px 'JetBrains Mono';color:var(--mute);text-align:center;font-style:normal;letter-spacing:.08em;margin-bottom:-6px}
-.st .split{height:11px;border-radius:6px;display:flex;overflow:hidden;gap:2px;background:#1B1F27;padding:2px}.st .split i{display:block;height:100%;border-radius:4px}
-.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;overflow:auto;animation:fade .4s ease both}
+.chip{font:500 12px 'Geist Mono',monospace;background:var(--panel2);padding:6px 10px;border-radius:999px}
+.chip.l{background:var(--ink);color:var(--inv)}
+.quote{font:500 19px/1.3 Geist,sans-serif;letter-spacing:-.03em;margin-top:14px}
+.st{display:grid;grid-template-columns:48px 1fr 48px;gap:10px;align-items:center;font:500 13px 'Geist Mono',monospace;margin-bottom:12px;font-variant-numeric:tabular-nums}
+.st em{grid-column:1/-1;font:500 10.5px 'Geist Mono',monospace;color:var(--mute);text-align:center;font-style:normal;letter-spacing:.08em;margin-bottom:-6px}
+.st .split{height:10px;border-radius:6px;display:flex;overflow:hidden;gap:2px;background:#1B1F27;padding:2px}.st .split i{display:block;height:100%;border-radius:4px}
+.overlay{position:fixed;inset:0;z-index:20;display:flex;padding:16px;overflow:auto;-webkit-overflow-scrolling:touch;animation:fade .4s ease both}
+.overlay>*:not(.obg){margin:auto}
 .overlay .obg{position:fixed;inset:0;background-size:cover;background-position:center}
-.overlay .obg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,10,.5),rgba(6,8,10,.82))}
-.versus{position:relative;text-align:center;max-width:1100px}
-.versus .line{display:flex;align-items:center;justify-content:center;gap:30px;animation:up .6s ease both}
-.versus h2{font:800 clamp(30px,4.4vw,64px)/1 'Barlow Condensed';text-transform:uppercase;white-space:nowrap}
-.versus .v{font:800 34px 'Barlow Condensed';color:var(--lime)}
-.versus .q{font:600 30px/1.2 'Barlow Condensed';margin-top:26px;animation:up .6s .5s ease both}
-.versus .who{margin-top:10px;color:var(--mute);font-size:14px;animation:up .6s .7s ease both}
-.modal{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:22px;max-width:1080px;width:100%;overflow:hidden;backdrop-filter:blur(14px);animation:up .5s ease both}
-.mh{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 22px;border-bottom:1px solid var(--line)}
+.overlay .obg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,10,.55),rgba(6,8,10,.86))}
+.versus{position:relative;text-align:center;max-width:1100px;width:100%}
+.versus .line{display:flex;align-items:center;justify-content:center;gap:28px;animation:up .6s ease both}
+.versus h2{font:600 clamp(26px,4.4vw,60px)/1 Geist,sans-serif;letter-spacing:-.05em;white-space:nowrap}
+.versus .v{font:500 13px 'Geist Mono',monospace;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.versus .q{font:500 clamp(20px,2.6vw,30px)/1.25 Geist,sans-serif;letter-spacing:-.035em;margin:30px auto 0;max-width:760px;animation:up .6s .5s ease both}
+.versus .who{margin-top:14px;color:var(--mute);font:500 12px/1.6 'Geist Mono',monospace;letter-spacing:.04em;text-transform:uppercase;animation:up .6s .7s ease both}
+.modal{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:28px;max-width:1080px;width:100%;overflow:clip;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);animation:up .5s ease both}
+.mh{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:22px 24px;border-bottom:1px solid var(--line)}
 .mgrid{display:grid;grid-template-columns:1.1fr 1fr}
-.mgrid>div{padding:20px 22px}.mgrid>div+div{border-left:1px solid var(--line)}
-textarea{width:100%;min-height:92px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:15px Inter;padding:12px;resize:vertical}
-textarea:focus{outline:1px solid var(--lime)}
-.quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.quick button{background:transparent;border:1px solid var(--line);border-radius:20px;padding:6px 11px;font-size:12.5px;cursor:pointer;color:var(--mute)}
-.quick button:hover{color:var(--ink);border-color:var(--ink)}
+.mgrid>div{padding:22px 24px}.mgrid>div+div{border-left:1px solid var(--line)}
+.mf{position:sticky;bottom:0;padding:14px 24px;border-top:1px solid var(--line);background:rgba(14,15,17,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:0 0 28px 28px;z-index:2}
+textarea{width:100%;min-height:104px;background:var(--panel2);border:1px solid transparent;border-radius:16px;color:var(--ink);font:16px/1.45 Geist,sans-serif;padding:14px;resize:vertical}
+textarea:focus,input.nm:focus{outline:0;border-color:var(--lime)}
+.quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.quick button{background:transparent;box-shadow:inset 0 0 0 1px var(--line);border:0;border-radius:999px;padding:8px 13px;font-size:12.5px;cursor:pointer;color:var(--mute);text-align:left}
 .room{max-height:440px;overflow:auto}
-.pr{padding:8px 0;border-bottom:1px solid var(--line)}.pr:last-child{border-bottom:0}
-.pr .l1{display:flex;align-items:center;gap:8px;font-size:14px}.pr .l1 b{flex:1;font-weight:600}
-.pr .tr{font-size:12px;color:var(--mute)}
-.pr .why{font-size:12.5px;color:#C9D2CC;margin-top:3px;line-height:1.4;animation:up .4s ease both}
-.delta{font:700 12px 'JetBrains Mono';padding:3px 7px;border-radius:6px;animation:up .4s ease both}
-.delta.up{background:#E2E8FF;color:#2437C9}.delta.down{background:#FDE4DF;color:#C2290F}
-.tone{font:800 26px/1.1 'Barlow Condensed';text-transform:uppercase;margin-bottom:4px}
-.hero{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);margin-bottom:18px;background:url(/img/stadium.jpg) center 62%/cover}
-.hero:before{content:"";position:absolute;inset:0;background:rgba(6,8,10,.78)}
-.hero .hin{position:relative;padding:26px;text-align:center}
-.res{display:inline-block;font:800 16px 'Barlow Condensed';letter-spacing:.14em;padding:4px 14px;border-radius:8px;margin-bottom:10px}
-.ft{display:flex;align-items:center;justify-content:center;gap:28px}
-.ft h2{font:800 40px/1 'Barlow Condensed';text-transform:uppercase}
-.ft .n{font:800 96px/1 'Barlow Condensed'}
-.end{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px;align-items:start}
+.pr{padding:10px 0;border-bottom:1px solid var(--line)}.pr:last-child{border-bottom:0}
+.pr .l1{display:flex;align-items:center;gap:8px;font-size:14px}.pr .l1 b{flex:1;font-weight:600;letter-spacing:-.01em;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr .tr{font-size:12px;color:var(--mute);margin:2px 0 0 42px}
+.pr .why{font-size:12.5px;color:#D2D3CE;margin:4px 0 0 42px;line-height:1.45;animation:up .4s ease both}
+.delta{font:600 12px 'Geist Mono',monospace;padding:4px 8px;border-radius:999px;animation:up .4s ease both}
+.delta.up{background:#E3E8FF;color:#2437C9}.delta.down{background:#FDE4DF;color:#C2290F}
+.tone{font:600 28px/1.1 Geist,sans-serif;letter-spacing:-.04em;margin-bottom:6px}
+.hero{position:relative;border-radius:28px;overflow:hidden;margin-bottom:14px;background-image:url(/img/stadium.jpg);background-position:center 62%}
+.hero:before{content:"";position:absolute;inset:0;background:rgba(6,8,10,.74)}
+.hero .hin{position:relative;padding:30px 26px 28px;text-align:center}
+.res{display:inline-block;font:500 12px 'Geist Mono',monospace;letter-spacing:.08em;padding:7px 14px;border-radius:999px;margin-bottom:14px}
+.ft{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:28px;max-width:860px;margin:0 auto}
+.ft .tm{justify-content:flex-end;text-align:right}.ft .tm.r{justify-content:flex-start;text-align:left}
+.ft h2{font:600 30px/1 Geist,sans-serif;letter-spacing:-.045em}
+.ft .n{font:600 88px/1 Geist,sans-serif;letter-spacing:-.06em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.end{display:grid;grid-template-columns:.85fr 1.15fr;gap:14px;align-items:start}
 .tl{position:relative;padding-left:26px;margin:6px 0 4px}
-.tl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
-.nt{position:relative;padding:0 0 14px;animation:up .4s ease both}
-.nt:before{content:"";position:absolute;left:-23px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(61,91,255,.15)}
-.nt .s{font-size:13.5px;color:var(--mute);line-height:1.45}.nt .d{font-size:15px;line-height:1.45;margin-top:2px}
-.nt .k{font:600 10px 'JetBrains Mono';letter-spacing:.1em;color:var(--mute);margin-right:6px}.nt .d .k{color:var(--lime)}
-.sec{font:600 11px 'JetBrains Mono';letter-spacing:.06em;color:var(--mute);margin:16px 0 10px;display:flex;align-items:center;gap:10px}
-.sec:after{content:"";flex:1;height:1px;background:var(--line)}
-details{margin-top:6px}summary{cursor:pointer;font:600 12px 'JetBrains Mono';color:var(--mute)}
-pre{white-space:pre-wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font:12px/1.55 'JetBrains Mono';color:var(--mute);margin-top:8px}
-.season{position:relative;min-height:calc(100vh - 56px);display:flex;align-items:flex-end;background-size:cover;background-position:center}
+.tl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:1px;background:var(--line)}
+.nt{position:relative;padding:0 0 16px;animation:up .4s ease both}
+.nt:before{content:"";position:absolute;left:-22px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 4px var(--panel)}
+.nt .s{font-size:13.5px;color:var(--mute);line-height:1.5}.nt .d{font-size:15px;line-height:1.5;margin-top:3px;letter-spacing:-.01em}
+.nt .k{font:500 10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--mute);margin-right:8px}.nt .d .k{color:var(--lime)}
+.sec{font:500 11px/1.5 'Geist Mono',monospace;letter-spacing:.05em;color:var(--mute);margin:20px 0 12px;display:flex;align-items:center;gap:10px}
+.sec:after{content:"";flex:1;min-width:12px;height:1px;background:var(--line)}
+details{margin-top:8px}summary{cursor:pointer;font:500 12px 'Geist Mono',monospace;color:var(--mute);padding:6px 0}
+pre{white-space:pre-wrap;background:var(--panel2);border-radius:16px;padding:14px;font:12px/1.6 'Geist Mono',monospace;color:var(--mute);margin-top:8px;overflow-wrap:anywhere}
+.season{position:relative;min-height:calc(100vh - 70px);min-height:calc(100svh - 70px);display:flex;align-items:flex-end;background-size:cover;background-position:center;margin:10px 14px 14px;border-radius:28px;overflow:hidden}
 .season:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,8,10,.94) 0%,rgba(6,8,10,.7) 46%,rgba(6,8,10,.15) 100%)}
-.season .in{position:relative;padding:44px;max-width:640px;animation:up .7s ease both}
-.season h1{font:800 clamp(64px,9vw,128px)/.88 'Barlow Condensed';text-transform:uppercase}
+.season .in{position:relative;padding:44px;max-width:660px;width:100%;animation:up .7s ease both}
+.season h1{font:600 clamp(48px,8.4vw,112px)/.94 Geist,sans-serif;letter-spacing:-.055em;margin-top:12px}
+.season .tile{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:none}
 .av{border-radius:50%;background-color:#2A2F38;background-repeat:no-repeat;flex:none;display:inline-block}
-.squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:12px}
-.pc{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:10px;cursor:pointer;transition:transform .15s,box-shadow .15s;text-align:left}
-.pc:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(20,20,30,.16)}
-.pc.in{background:#fff;border-color:var(--ink)}
-.pc .ph{width:100%;aspect-ratio:1;border-radius:12px;background-color:#2A2F38;background-repeat:no-repeat}
-.pc .ov{position:absolute;top:16px;left:16px;font:800 22px 'Barlow Condensed';color:#fff;background:rgba(10,12,16,.75);padding:1px 7px;border-radius:7px}
-.pc .ps{position:absolute;top:16px;right:16px;font:600 10px 'JetBrains Mono';color:#fff;background:var(--lime);padding:3px 6px;border-radius:6px}
-.pc b{display:block;font-size:13.5px;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pc span.t{font-size:11.5px;color:var(--mute)}
-.setup{position:relative;min-height:100vh;display:grid;place-items:center;padding:30px 22px;background:url(/img/stadium.jpg) center/cover}
-.setup:before{content:"";position:absolute;inset:0;background:rgba(8,9,12,.86)}
-.setup .sin{position:relative;max-width:1200px;width:100%;display:grid;grid-template-columns:.85fr 1.3fr;gap:34px;align-items:center;animation:up .6s ease both}
-.letter{background:#F6F2E7;color:#15161A;border-radius:6px;padding:30px 30px 26px;font:15.5px/1.65 Georgia,serif;box-shadow:0 30px 80px rgba(0,0,0,.55);transform:rotate(-1.2deg)}
-.letter h4{font:600 12px 'JetBrains Mono';letter-spacing:.12em;margin-bottom:14px;color:#6D727B}
+.squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.pc{position:relative;background:var(--panel2);border:0;border-radius:20px;padding:8px 8px 12px;cursor:pointer;transition:transform .2s,box-shadow .2s;text-align:left}
+.pc.in{background:var(--ink);color:var(--inv)}.pc.in span.t{color:rgba(255,255,255,.6)}
+.pc .ph{width:100%;aspect-ratio:1;border-radius:14px;background-color:#2A2F38;background-repeat:no-repeat}
+.pc .ov{position:absolute;top:14px;left:14px;font:600 13px 'Geist Mono',monospace;color:#0C0C0C;background:rgba(255,255,255,.92);padding:3px 8px;border-radius:999px}
+.pc .ps{position:absolute;top:14px;right:14px;font:500 10.5px 'Geist Mono',monospace;color:#fff;background:rgba(12,12,12,.72);padding:4px 7px;border-radius:999px;backdrop-filter:blur(6px)}
+.pc b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.02em;margin:10px 4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc span.t{font-size:11.5px;color:var(--mute);margin:0 4px;display:block}
+.setup{position:relative;min-height:100vh;min-height:100svh;display:grid;place-items:center;padding:40px 22px;background-image:url(/img/stadium.jpg);background-position:center}
+.setup:before{content:"";position:absolute;inset:0;background:rgba(8,9,12,.84)}
+.setup .sin{position:relative;max-width:1200px;width:100%;display:grid;grid-template-columns:.85fr 1.3fr;gap:44px;align-items:center;animation:up .6s ease both}
+.setup h2{font:600 clamp(34px,4.6vw,58px)/1 Geist,sans-serif;letter-spacing:-.05em;margin:12px 0 20px}
+.letter{background:#F6F2E7;color:#15161A;border-radius:6px;padding:32px 32px 28px;font:15.5px/1.65 Georgia,serif;box-shadow:0 30px 80px rgba(0,0,0,.55);transform:rotate(-1.2deg)}
+.letter h4{font:500 11px 'Geist Mono',monospace;letter-spacing:.1em;margin-bottom:16px;color:#6D727B}
 .letter p{margin-bottom:10px}.letter .sig{font:italic 22px Georgia,serif;margin-top:14px}
-.letter table{width:100%;border-collapse:collapse;font:600 13px 'JetBrains Mono';margin:6px 0 12px}.letter td{padding:5px 4px;border-bottom:1px solid #DDD6C4}.letter tr.me td{background:#15161A;color:#F6F2E7}
-.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
-.sty{position:relative;border-radius:16px;overflow:hidden;border:2px solid transparent;cursor:pointer;background-color:#15181D;aspect-ratio:3/4.2;background-size:cover;background-position:center top;text-align:left;padding:0;transition:transform .15s;opacity:.72}
-.sty:hover{transform:translateY(-4px)}
-.sty.on{border-color:#fff;box-shadow:0 0 0 4px rgba(110,134,255,.65);opacity:1}
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 20px}
+.sty{position:relative;border-radius:22px;overflow:hidden;border:0;cursor:pointer;background-color:#15181D;aspect-ratio:3/4.2;background-size:cover;background-position:center top;text-align:left;padding:0;transition:transform .2s,opacity .2s;opacity:.6}
+.sty.on{box-shadow:0 0 0 2px #0C0D10,0 0 0 4px #fff;opacity:1}
 .sty:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,9,12,0) 30%,rgba(8,9,12,.96) 100%)}
-.sty div{position:absolute;left:14px;right:14px;bottom:12px}
-.sty b{font:800 26px/1 'Barlow Condensed';text-transform:uppercase;display:block;color:#fff}
-.sty span{font-size:12.5px;color:#C9CED3;line-height:1.4;display:block;margin-top:4px}
-.sty em{font:600 11px 'JetBrains Mono';color:#9DB0FF;font-style:normal;display:block;margin-top:6px}
-input.nm{width:100%;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font:600 17px Inter;padding:12px 14px;margin-bottom:14px}
+.sty div{position:absolute;left:16px;right:16px;bottom:14px}
+.sty b{font:600 22px/1.05 Geist,sans-serif;letter-spacing:-.04em;display:block;color:#fff}
+.sty span{font-size:12.5px;color:#C9CED3;line-height:1.4;display:block;margin-top:5px}
+.sty em{font:500 10.5px/1.4 'Geist Mono',monospace;color:#B9C4FF;font-style:normal;display:block;margin-top:8px;letter-spacing:.04em}
+input.nm{width:100%;background:rgba(255,255,255,.08);border:1px solid transparent;border-radius:16px;color:#fff;font:500 17px Geist,sans-serif;padding:16px 18px}
+input.nm::placeholder,textarea::placeholder{color:rgba(255,255,255,.4)}
 .storyp{font:15.5px/1.6 Georgia,serif}
-.headline{font:800 clamp(30px,4.4vw,58px)/.95 'Barlow Condensed';text-transform:uppercase;margin:4px 0 14px}
-.paper{font:600 11px 'JetBrains Mono';letter-spacing:.12em;color:var(--mute)}
-.tblwrap{max-height:318px;overflow:auto}
-.strip{display:flex;gap:14px;align-items:center;background:var(--ink);color:var(--panel);border-radius:14px;padding:13px 18px;margin-bottom:18px;font-size:15px;line-height:1.45}
-.strip b{font:800 13px 'JetBrains Mono';letter-spacing:.1em;color:#9DB0FF;white-space:nowrap}
-.pm{display:grid;grid-template-columns:240px 1fr;gap:22px;padding:22px}
-.pm .ph{width:240px;height:240px;border-radius:18px;background-color:#2A2F38;background-repeat:no-repeat}
-@media (max-width:1180px){.hub{grid-template-columns:1fr 1fr}.hub>:last-child{grid-column:1/-1}.cc{grid-template-columns:1fr 320px}.cc>:first-child{display:none}.fixture .fin{grid-template-columns:1fr auto 1fr}.boss{grid-column:1/-1;width:auto}}
-@media (max-width:820px){.hub,.cc,.end,.mgrid,.two,.setup .sin,.pm{grid-template-columns:1fr}.mgrid>div+div{border-left:0;border-top:1px solid var(--line)}.title .in,.season .in{padding:24px 16px}.wrap{padding:14px}.big{font-size:44px}.sb h3{font-size:19px}.side h2{font-size:24px}.servchip span:not(.dot),.pips em{display:none}.ft{gap:12px;flex-wrap:wrap}.ft .n{font-size:64px}.ft h2{font-size:22px}.goalban b{font-size:90px}}
+.headline{font:600 clamp(28px,4.4vw,56px)/1 Geist,sans-serif;letter-spacing:-.05em;margin:8px auto 22px;max-width:900px}
+.paper{font:500 11px 'Geist Mono',monospace;letter-spacing:.1em;color:var(--mute)}
+.tblwrap{max-height:330px;overflow:auto}
+.strip{display:flex;gap:16px;align-items:baseline;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px 20px;margin-bottom:14px;font-size:15px;line-height:1.5;box-shadow:var(--sh)}
+.strip b{font:500 11.5px 'Geist Mono',monospace;letter-spacing:.06em;color:var(--mute);white-space:nowrap}
+.pm{display:grid;grid-template-columns:240px 1fr;gap:24px;padding:24px}
+.pm .ph{width:240px;height:240px;border-radius:20px;background-color:#2A2F38;background-repeat:no-repeat}
+.pm h3{font:600 40px/1 Geist,sans-serif;letter-spacing:-.05em;margin-top:6px}
+.dock{display:block}
+@media (hover:hover){.btn:not(:disabled):hover{transform:translateY(-2px)}.pc:hover{transform:translateY(-4px);box-shadow:0 16px 30px -12px rgba(12,12,12,.3)}.sty:hover{transform:translateY(-4px);opacity:1}.seg button:not(.on):hover,.quick button:hover{color:var(--ink)}}
+@media (max-width:1180px){.hub{grid-template-columns:1fr 1fr}.hub>:last-child{grid-column:1/-1}.cc{grid-template-columns:1fr 320px}.cc>.t-xi{display:none}.fixture .fin{grid-template-columns:1fr auto 1fr}.boss{grid-column:1/-1;width:auto}}
+@media (max-width:820px){
+:root{--r:22px}
+.hub,.cc,.end,.mgrid,.two,.setup .sin{grid-template-columns:1fr}
+.top{margin:8px 8px 0;top:8px;padding:7px 7px 7px 14px;gap:10px}
+.pips em,.servchip i,.servchip .x{display:none}.servchip{padding:9px 12px;gap:8px}
+.wrap{padding:12px 8px calc(104px + env(safe-area-inset-bottom))}
+.title .in{padding:28px 20px calc(32px + env(safe-area-inset-bottom))}.title p{font-size:16px;margin:16px 0 20px}
+.mgrs{flex-wrap:nowrap;overflow-x:auto;margin:0 -20px 24px;padding:0 20px;scrollbar-width:none}.mgrs::-webkit-scrollbar{display:none}.mgr{flex:none}
+.title .btn{width:100%}
+.fixture .fin{padding:22px 16px 16px;gap:12px}
+.side,.side.r{flex-direction:column;text-align:center;gap:10px}.side.r{flex-direction:column-reverse}
+.side h2{font-size:20px}.side span{margin-top:4px;font-size:10.5px}
+.side img{width:52px!important;height:52px!important}
+.boss{padding:8px 14px 8px 8px;border-radius:18px}.boss img{width:60px;height:60px;border-radius:13px}.boss em{display:none}.boss b{font-size:15px}
+.strip{flex-direction:column;gap:6px;padding:14px 16px;font-size:14.5px}
+.tbl .x{display:none}
+.squad{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -18px;padding:0 18px 4px;scrollbar-width:none}.squad::-webkit-scrollbar{display:none}
+.pc{flex:0 0 132px;scroll-snap-align:start}
+.dock{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:6;background:rgba(255,255,255,.82);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:0 18px 40px -12px rgba(12,12,12,.35)}
+.sb{padding:16px 12px 18px;gap:8px;align-items:start}
+.sb .tm,.ft .tm{flex-direction:column;text-align:center;gap:8px;justify-content:flex-start}.sb .tm.r,.ft .tm.r{flex-direction:column-reverse;justify-content:flex-end}
+.sb h3{font-size:15px;letter-spacing:-.02em}.sb .sc{font-size:11.5px;margin-top:3px}
+.sb .tm img{width:40px!important;height:40px!important}
+.big{font-size:46px;gap:6px;margin-top:4px}.big span{min-width:28px}
+.cc{margin-top:8px;gap:8px}.cc .tg{display:contents}
+.t-pitch{order:1}.t-feed{order:2}.t-mom{order:3}.t-stats{order:4}.t-rival{order:5}
+.feed{max-height:190px}
+.overlay{padding:8px}
+.versus .line{display:grid;grid-template-columns:1fr auto 1fr;gap:10px 8px;justify-items:center}
+.versus .line>:nth-child(1){grid-area:1/1}.versus .line>:nth-child(2){grid-area:2/1}.versus .line>:nth-child(3){grid-area:1/2/3/3;align-self:center}.versus .line>:nth-child(4){grid-area:2/3}.versus .line>:nth-child(5){grid-area:1/3}
+.versus .line img{width:64px!important;height:64px!important}.versus h2{font-size:20px;white-space:normal;letter-spacing:-.04em}
+.versus .q{margin-top:26px;padding:0 8px}.versus .who{padding:0 8px}
+.modal{border-radius:24px}.mh{flex-direction:column;align-items:flex-start;padding:18px 18px 16px;gap:10px}
+.mgrid>div{padding:18px}.mgrid>div+div{border-left:0;border-top:1px solid var(--line)}
+.mf{padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-radius:0 0 24px 24px}
+.room{max-height:none}
+.quick{flex-wrap:nowrap;overflow-x:auto;margin:10px -18px 0;padding:0 18px;scrollbar-width:none}.quick::-webkit-scrollbar{display:none}.quick button{flex:none}
+.hero .hin{padding:24px 14px 22px}
+.ft{gap:10px;align-items:start}.ft h2{font-size:16px;letter-spacing:-.03em}.ft .n{font-size:52px;margin-top:6px}.ft .tm img{width:44px!important;height:44px!important}
+.end .tg{display:contents}.e-stats{order:1}.e-note{order:2}.e-best{order:3}.e-table{order:4}
+.season{margin:8px;min-height:calc(100svh - 70px)}.season:before{background:linear-gradient(180deg,rgba(6,8,10,.2) 0%,rgba(6,8,10,.86) 34%,rgba(6,8,10,.96) 100%)}
+.season .in{padding:170px 14px 18px}.season .btn{flex:1}
+.setup{padding:20px 12px calc(24px + env(safe-area-inset-bottom));place-items:start center}.setup .sin{gap:26px}
+.letter{transform:none;padding:24px 20px 22px;font-size:15px}
+.styles{grid-template-columns:1fr}
+.sty{aspect-ratio:auto;height:124px;background-size:auto 250%;background-position:right 16%;opacity:.75}
+.sty:before{background:linear-gradient(90deg,rgba(8,9,12,.96) 0%,rgba(8,9,12,.86) 48%,rgba(8,9,12,.1) 100%)}
+.sty div{right:34%;top:50%;bottom:auto;transform:translateY(-50%)}.sty b{font-size:20px}
+.setup .btn{width:100%}
+.pm{grid-template-columns:1fr;gap:16px;padding:16px}.pm .ph{width:150px;height:150px;border-radius:18px}.pm h3{font-size:32px}
+.pm .btn{flex:1}
+.goalban span{margin-top:6px}
+}
 </style>
 </head>
 <body>
@@ -225,7 +296,7 @@ const rat = (p) => clamp(p.rating || 6.5, 4, 10);
 const LOGO = { you: 1, blank: 1, ortega: 1, ferrier: 1 };
 function crest(c, s = 44) {
   if (LOGO[c.id] || /^o\d+$/.test(c.id)) return `<img src="/img/crest-${c.id}.jpg" alt="" width="${s}" height="${s}" style="width:${s}px;height:${s}px;border-radius:24%;flex:none;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.28)">`;
-  return `<span style="width:${s}px;height:${s}px;border-radius:24%;flex:none;display:inline-grid;place-items:center;background:${c.color};color:#fff;font:800 ${Math.round(s * 0.42)}px 'Barlow Condensed';letter-spacing:.02em">${c.short.slice(0, s < 30 ? 1 : 3)}</span>`;
+  return `<span style="width:${s}px;height:${s}px;border-radius:24%;flex:none;display:inline-grid;place-items:center;background:${c.color};color:#fff;font:600 ${Math.round(s * 0.38)}px Geist;letter-spacing:-.02em">${c.short.slice(0, s < 30 ? 1 : 3)}</span>`;
 }
 function faceCss(p) { const i = p.face || 0, k = i % 9, S = 3.5, pos = (c) => (((c * S - 0.5) / (S - 1)) * 100).toFixed(1); return `background-image:url(/img/faces${Math.floor(i / 9) + 1}.jpg);background-size:${S * 100}%;background-position:${pos(((k % 3) + 0.5) / 3)}% ${pos((Math.floor(k / 3) + 0.45) / 3)}%`; }
 const face = (p, s) => `<span class="av" style="width:${s}px;height:${s}px;${faceCss(p)}"></span>`;
@@ -241,14 +312,14 @@ const BLURB = [
   'Third game. Ferrier has had two matches to study you. Whatever you did to get here, he has watched it twice.',
 ];
 function playerModal(p, buy) {
-  const q = p.ref || p, ov = document.createElement('div'); ov.className = 'overlay'; ov.style.background = 'rgba(8,9,12,.78)';
+  const q = p.ref || p, ov = document.createElement('div'); ov.className = 'overlay'; ov.style.background = 'rgba(8,9,12,.72)'; ov.style.backdropFilter = ov.style.webkitBackdropFilter = 'blur(10px)';
   const bar = (l, v) => `<div class="row"><span class="pos" style="width:64px">${l}</span><div class="bar"><i style="width:${v}%;background:#6E86FF"></i></div><span class="pill">${v}</span></div>`;
   ov.innerHTML = `<div class="modal" style="max-width:760px"><div class="pm"><div class="ph" style="${faceCss(q)}"></div><div>
-    <div class="small mono">${q.pos} · AGE ${q.age} · ${q.trait.toUpperCase()}</div><div class="cond" style="font-size:44px;font-weight:800;line-height:1">${esc(q.name)}</div>
+    <div class="small mono">${q.pos} · AGE ${q.age} · ${q.trait.toUpperCase()}</div><h3>${esc(q.name)}</h3>
     <p class="storyp" style="margin:12px 0 14px">${esc(q.story)}</p>
     ${bar('ATTACK', q.att)}${bar('DEFENCE', q.def)}${bar('STAMINA', q.sta)}${bar('MORALE', q.morale * 10)}
     <div class="small" style="margin-top:10px">${q.goals} goal${q.goals === 1 ? '' : 's'} this season · overall ${q.ovr} · value £${val(q)}m</div>
-    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center"><button class="btn" style="padding:9px 18px;font-size:16px" id="pmt"></button><button class="btn ghost" style="padding:9px 18px;font-size:16px" id="pmx">Close</button><span class="small" id="pmn"></span></div></div></div></div>`;
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center"><button class="btn sm" id="pmt"></button><button class="btn ghost sm" id="pmx">Close</button><span class="small" id="pmn"></span></div></div></div></div>`;
   document.body.appendChild(ov); ov.onclick = (e) => { if (e.target === ov || e.target.id === 'pmx') ov.remove(); };
   const sq = CLUBS.you.squad, bt = ov.querySelector('#pmt'), nt = ov.querySelector('#pmn'), MIN = { GK: 1, DF: 5, MF: 5, FW: 3 }, price = val(q);
   if (buy) {
@@ -278,12 +349,14 @@ function whistle(n = 1) { if (!AC) return; for (let i = 0; i < n; i++) { const t
 let inflight = 0;
 function topbar() {
   const avgS = ledger.calls ? (ledger.ms / ledger.calls / 1000).toFixed(1) : '0.0';
-  return `<div class="top"><div class="brand">TOUCH<i>LINE</i></div>
+  const ico = muted ? '<path d="M3 6h2.5L9 3v10L5.5 10H3z" fill="currentColor"/><path d="M11.5 6l3 4m0-4l-3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' : '<path d="M3 6h2.5L9 3v10L5.5 10H3z" fill="currentColor"/><path d="M11.2 5.4a3.6 3.6 0 010 5.2M12.9 3.6a6.2 6.2 0 010 8.8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
+  return `<div class="top"><div class="brand"><span></span>Touchline</div>
     <div class="pips">${[0, 1, 2].map((i) => `<span class="${i < state.md ? 'done' : i === state.md ? 'now' : ''}"></span>`).join('')}<em>Matchday ${Math.min(state.md + 1, 3)} / 3</em></div>
-    <div class="servchip ${inflight ? 'busy' : ''}"><span class="dot"></span><b>SERV Reasoning</b><span>${inflight ? 'thinking…' : ledger.calls + (ledger.calls === 1 ? ' decision' : ' decisions')}</span><span>$${ledger.cost.toFixed(4)}</span><span>${avgS}s avg</span><span>${ledger.blocked} blocked</span></div>
-    <button class="snd" id="snd">${muted ? 'Sound off' : 'Sound on'}</button></div>`;
+    <div class="servchip ${inflight ? 'busy' : ''}"><span class="dot"></span><b>SERV<i> Reasoning</i></b><span>${inflight ? 'thinking…' : ledger.calls + `<i>${ledger.calls === 1 ? ' decision' : ' decisions'}</i>`}</span><span class="x">$${ledger.cost.toFixed(4)}</span><span class="x">${avgS}s avg</span><span class="x">${ledger.blocked} blocked</span></div>
+    <button class="snd ${muted ? 'off' : ''}" id="snd" aria-label="${muted ? 'Turn sound on' : 'Turn sound off'}"><svg viewBox="0 0 16 16">${ico}</svg></button></div>`;
 }
-function bindTop() { const b = $('#snd'); if (b) b.onclick = () => { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.5; refreshTop(); }; }
+function focusMe() { document.querySelectorAll('.tblwrap').forEach((w) => { const me = w.querySelector('tr.me'); if (me) w.scrollTop = Math.max(0, me.offsetTop - w.clientHeight / 2 + 20); }); }
+function bindTop() { focusMe(); const b = $('#snd'); if (b) b.onclick = () => { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.5; refreshTop(); }; }
 function refreshTop() { const t = $('.top'); if (t) { t.outerHTML = topbar(); bindTop(); } }
 function call(body) { inflight++; refreshTop(); return serv(body).finally(() => { inflight--; refreshTop(); }); }
 
@@ -294,13 +367,13 @@ function shirt(g, x, y, col, ink, num, s) {
   g.beginPath(); g.moveTo(-9, -13); g.lineTo(-17, -8); g.lineTo(-13, -1); g.lineTo(-9, -3); g.lineTo(-9, 13); g.lineTo(9, 13); g.lineTo(9, -3); g.lineTo(13, -1); g.lineTo(17, -8); g.lineTo(9, -13); g.quadraticCurveTo(0, -8, -9, -13); g.closePath();
   g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 8; g.shadowOffsetY = 4; g.fillStyle = col; g.fill(); g.shadowColor = 'transparent';
   g.strokeStyle = 'rgba(0,0,0,.45)'; g.lineWidth = 1.2; g.stroke();
-  g.fillStyle = ink; g.font = '700 11px Inter'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(num, 0, 3); g.restore();
+  g.fillStyle = ink; g.font = '700 11px Geist'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(num, 0, 3); g.restore();
 }
 
 // ---------- title ----------
 function title() {
   app.innerHTML = `<section class="title"><div class="bgi"></div><div class="in">
-    <div class="cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:10px">A football management game</div>
+    <div class="eyebrow">A football management game</div>
     <h1>Out-think<br><i>the dugout.</i></h1>
     <p>You've taken the Ashford Town job with three games to win the league. Every rival manager watches your last match, picks a plan to beat you and changes it at half-time. They think for themselves, and after each game you get to read their notes.</p>
     <div class="mgrs">${['blank', 'ortega', 'ferrier'].map((id) => `<div class="mgr"><img src="${IMG[id]}" alt=""><div><b>${CLUBS[id].manager}</b><span>${CLUBS[id].name} · ${CLUBS[id].tag}</span></div></div>`).join('')}</div>
@@ -312,15 +385,15 @@ function setup() {
   window.scrollTo(0, 0);
   const top = table().slice(0, 5), sq = CLUBS.you.squad;
   call({ action: 'bios', players: sq.map((p) => ({ name: p.name, pos: p.pos, age: p.age, trait: p.trait })) }).then((r) => { for (const b of r.bios || []) { const p = sq.find((x) => x.name === b.name); if (p && b.story) p.story = b.story; } }).catch(() => {});
-  app.innerHTML = `<section class="setup"><div class="sin">
+  app.innerHTML = `<section class="setup photo"><div class="sin">
     <div class="letter"><h4>ASHFORD TOWN FC · OFFICE OF THE CHAIRMAN</h4>
       <p>Welcome to Ashford. I'll keep this short, because we don't have long.</p>
       <p>The season starts on Saturday and the fixture list has not been kind. Our first three matches are against last year's top three.</p>
       <table style="display:none">${top.map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td>${r.pts}</td></tr>`).join('')}</table>
       <p>Blank, Ortega and Ferrier will each study what you did the week before. I have found you £12m for the squad. Spend it well, sell who you must, and be top of this league after three games. Otherwise we'll both be looking for work.</p>
-      <div class="sig">M. Halloran</div><div style="font:600 11px 'JetBrains Mono';color:#6D727B">CHAIRMAN</div></div>
-    <div><div class="cond" style="color:#9DB0FF;font-size:16px;letter-spacing:.14em">Before you sign</div>
-      <div class="cond" style="font-size:56px;font-weight:800;line-height:.95;margin:4px 0 14px">What kind of manager are you?</div>
+      <div class="sig">M. Halloran</div><div style="font:500 11px 'Geist Mono';color:#6D727B;letter-spacing:.08em">CHAIRMAN</div></div>
+    <div><div class="eyebrow">Before you sign</div>
+      <h2>What kind of manager are you?</h2>
       <input class="nm" id="mname" maxlength="28" placeholder="Your name on the contract">
       <div class="styles">${Object.entries(STYLES).map(([k, v]) => `<button class="sty ${k === MG.style ? 'on' : ''}" data-k="${k}" style="background-image:url(/img/${v.img}.jpg)"><div><b>${v.name}</b><span>${v.line}</span><em>${v.perk}</em></div></button>`).join('')}</div>
       <button class="btn" id="sign">Sign the contract</button></div>
@@ -337,7 +410,7 @@ function setup() {
 // ---------- pre-match ----------
 let plan = null, planP = null;
 function tableHtml() {
-  return `<div class="tblwrap"><table class="tbl"><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>${table().map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td><div>${crest(ALL[r.id], 18)}${esc(r.name)}</div></td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table></div>`;
+  return `<div class="tblwrap"><table class="tbl"><tr><th>#</th><th>Club</th><th>P</th><th class="x">W</th><th class="x">D</th><th class="x">L</th><th>GD</th><th>Pts</th></tr>${table().map((r, i) => `<tr class="${r.id === 'you' ? 'me' : ''}"><td>${i + 1}</td><td><div>${crest(ALL[r.id], 20)}${esc(r.name)}</div></td><td>${r.p}</td><td class="x">${r.w}</td><td class="x">${r.d}</td><td class="x">${r.l}</td><td>${r.gd >= 0 ? '+' : ''}${r.gd}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table></div>`;
 }
 function prematch() {
   window.scrollTo(0, 0);
@@ -352,7 +425,7 @@ function prematch() {
   const threats = [...opp.squad].sort((a, b) => b.att - a.att).slice(0, 4);
   if (t.mark !== 'None' && !threats.some((p) => p.name === t.mark)) t.mark = 'None';
   app.innerHTML = topbar() + `<div class="wrap">
-    <section class="fixture"><div class="fin">
+    <section class="fixture photo"><div class="fin">
       <div class="side">${crest(CLUBS.you, 58)}<div><h2>Ashford Town</h2><span>YOU · ${fx.home ? 'HOME' : 'AWAY'}</span></div></div>
       <div class="vs"><span>MATCHDAY ${state.md + 1} OF 38</span><b>VS</b></div>
       <div class="side r"><div><h2>${opp.name}</h2><span>${opp.tag.toUpperCase()}</span></div>${crest(opp, 58)}</div>
@@ -360,7 +433,7 @@ function prematch() {
     </div></section>
     <div class="strip"><b>THE STORY</b><span>${BLURB[state.md]}${state.md ? ` You are ${ord(table().findIndex((r) => r.id === 'you') + 1)} after ${state.md} game${state.md === 1 ? '' : 's'}.` : ''}</span></div>
     <div class="hub">
-      <div class="tile"><div class="th">Tactics board <span class="mono" id="fl" style="font-size:12px;color:var(--lime)"></span></div><canvas id="pc"></canvas></div>
+      <div class="tile"><div class="th">Tactics board <span class="mono" id="fl" style="font-size:12px;color:var(--lime)"></span></div><div class="board"><canvas id="pc"></canvas></div></div>
       <div class="tile"><div class="th">Team instructions</div><div class="tb tg">
         <div><label>FORMATION</label>${seg('formation', Object.keys(FORMS))}</div>
         <div><label>MENTALITY</label>${seg('mentality', ['Defensive', 'Balanced', 'Attacking'])}</div>
@@ -368,14 +441,14 @@ function prematch() {
         <div><label>ATTACK THROUGH</label>${seg('attack_lane', ['Left', 'Centre', 'Right'])}</div>
         <div><label>MAN-MARK</label><select id="mark"><option value="None">Nobody</option>${threats.map((p) => `<option ${t.mark === p.name ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div>
         <div class="hint" id="hint"></div>
-        <button class="btn wide" id="ko">Kick off</button>
+        <div class="dock"><button class="btn wide" id="ko">Kick off</button></div>
       </div></div>
       <div class="tg">
-        <div class="tile"><div class="th">League table</div><div class="tb" style="padding:8px 14px">${tableHtml()}</div></div>
-        <div class="tile"><div class="th">Their dangermen</div><div class="tb" style="padding:8px 16px">${threats.map((p) => `<div class="row"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><div class="bar" style="max-width:90px"><i style="width:${p.att}%"></i></div><span class="pill">${p.att}</span></div>`).join('')}</div></div>
+        <div class="tile"><div class="th">League table</div><div class="tb">${tableHtml()}</div></div>
+        <div class="tile"><div class="th">Their dangermen</div><div class="tb">${threats.map((p) => `<div class="row"><span class="pos">${p.pos}</span><span class="nm">${esc(p.name)}</span><div class="bar" style="max-width:90px"><i style="width:${p.att}%"></i></div><span class="pill">${p.att}</span></div>`).join('')}</div></div>
       </div>
     </div>
-    <div class="tile" style="margin-top:18px"><div class="th">Your squad <span class="mono" style="font-size:11px">TAP A PLAYER FOR HIS STORY, OR TO SELL HIM</span></div><div class="tb"><div class="squad" id="squad"></div></div></div>
+    <div class="tile" style="margin-top:18px"><div class="th">Your squad <span class="mono" style="font-size:11px">TAP A PLAYER FOR HIS STORY</span></div><div class="tb"><div class="squad" id="squad"></div></div></div>
     <div class="tile" style="margin-top:18px"><div class="th">Transfer market <span class="mono" style="font-size:12px;color:var(--lime)" id="bud"></span></div><div class="tb"><div class="squad" id="market"></div></div></div>
     </div>`;
   bindTop();
@@ -394,7 +467,7 @@ const HINTS = {
 };
 function drawBoard() {
   const c = $('#pc'); if (!c) return;
-  const W = 560, H = 640, g = fit(c, W, H), t = state.tactics, xi = pickXI(CLUBS.you.squad, t.formation), f = FORMS[t.formation];
+  const W = 560, H = 640, g = fit(c, W, H), nf = c.clientWidth && c.clientWidth < 440 ? 15 : 12, t = state.tactics, xi = pickXI(CLUBS.you.squad, t.formation), f = FORMS[t.formation];
   for (let i = 0; i < 10; i++) { g.fillStyle = i % 2 ? '#1B1F27' : '#20252E'; g.fillRect(0, (H / 10) * i, W, H / 10); }
   g.strokeStyle = 'rgba(255,255,255,.5)'; g.lineWidth = 2;
   g.strokeRect(22, 22, W - 44, H - 44); g.beginPath(); g.moveTo(22, H / 2); g.lineTo(W - 22, H / 2); g.stroke();
@@ -406,14 +479,14 @@ function drawBoard() {
   g.fillStyle = 'rgba(61,91,255,.9)'; g.beginPath(); g.moveTo(lx, 34); g.lineTo(lx - 20, 64); g.lineTo(lx + 20, 64); g.closePath(); g.fill();
   const py = { High: 0.3, Mid: 0.44, Low: 0.58 }[t.press] * H;
   g.setLineDash([8, 8]); g.strokeStyle = 'rgba(255,255,255,.75)'; g.beginPath(); g.moveTo(30, py); g.lineTo(W - 30, py); g.stroke(); g.setLineDash([]);
-  g.fillStyle = 'rgba(255,255,255,.85)'; g.font = '600 10px JetBrains Mono, monospace'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText('PRESS LINE', 34, py - 7);
+  g.fillStyle = 'rgba(255,255,255,.85)'; g.font = '600 10px Geist Mono, monospace'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText('PRESS LINE', 34, py - 7);
   const sh = t.mentality === 'Attacking' ? -0.035 : t.mentality === 'Defensive' ? 0.035 : 0;
   const rows = [[1, 0.9], [f.DF, 0.73 + sh], [f.MF, 0.52 + sh], [f.FW, 0.3 + sh]]; let k = 0;
   for (const [n, y] of rows) for (let i = 0; i < n; i++, k++) {
     const p = xi[k], x = (0.06 + 0.88 * (i + 1) / (n + 1)) * W, yy = y * H;
     shirt(g, x, yy, CLUBS.you.color, '#111', k + 1, 1.45);
-    g.font = '600 12px Inter'; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,.55)'; const w = g.measureText(sur(p.name)).width + 12;
-    rr(g, x - w / 2, yy + 22, w, 18, 6); g.fill(); g.fillStyle = '#fff'; g.textBaseline = 'middle'; g.fillText(sur(p.name), x, yy + 31.5);
+    g.font = `600 ${nf}px Geist`; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,.55)'; const w = g.measureText(sur(p.name)).width + 12;
+    rr(g, x - w / 2, yy + 22, w, nf + 7, 7); g.fill(); g.fillStyle = '#fff'; g.textBaseline = 'middle'; g.fillText(sur(p.name), x, yy + 22 + (nf + 7) / 2 + 0.5);
     g.fillStyle = p.morale >= 8 ? '#3D5BFF' : p.morale >= 6 ? '#DDE5DA' : '#FF5A4E'; g.beginPath(); g.arc(x + 20, yy - 16, 4.5, 0, 7); g.fill();
   }
   const names = xi.map((p) => p.name), sqd = [...CLUBS.you.squad].sort((a, b) => names.includes(b.name) - names.includes(a.name) || b.ovr - a.ovr);
@@ -434,7 +507,7 @@ function layout(side) {
 const nearest = (side) => sim.pl.filter((p) => p.side === side && p.row > 0).sort((a, b) => Math.hypot(a.x - sim.ball.x, a.y - sim.ball.y) - Math.hypot(b.x - sim.ball.x, b.y - sim.ball.y))[0];
 function frame(ts) {
   const c = $('#mc'); if (!c || !sim) return;
-  const g = c.getContext('2d'), W = 1000, H = 620, mg = 30, b = sim.ball;
+  const g = c.getContext('2d'), W = 1000, H = 620, mg = 30, b = sim.ball, sm = c.clientWidth < 560, R = sm ? 25 : 14;
   const dt = Math.min(50, ts - (sim.last || ts)); sim.last = ts; sim.t += dt / 1000; const f = dt / 16;
   if (!sim.busy) {
     if (sim.t > sim.nextPass) { const mates = sim.pl.filter((p) => p.side === sim.poss && p.row > 0 && p !== sim.holder); const near = mates.filter((p) => Math.hypot(p.x - b.x, p.y - b.y) < 0.34); const pool = near.length ? near : mates; sim.holder = pool[Math.floor(Math.random() * pool.length)]; sim.nextPass = sim.t + 0.55 + Math.random() * 0.9; }
@@ -464,25 +537,25 @@ function frame(ts) {
   if (sim.trail && sim.t - sim.trail.t < 0.7) { g.strokeStyle = `rgba(255,255,255,${0.75 * (1 - (sim.t - sim.trail.t) / 0.7)})`; g.lineWidth = 3; g.beginPath(); g.moveTo(X(sim.trail.x), Y(sim.trail.y)); g.lineTo(X(b.x), Y(b.y)); g.stroke(); }
   for (const p of [...sim.pl].sort((a, c2) => a.y - c2.y)) {
     const club = [M.home, M.away][p.side].club, x = X(p.x), y = Y(p.y);
-    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x + 2, y + 12, 12, 5, 0, 0, 7); g.fill();
-    if (p === sim.holder) { g.strokeStyle = '#fff'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 16, 0, 7); g.stroke(); }
-    g.fillStyle = club.color; g.beginPath(); g.arc(x, y, 12, 0, 7); g.fill(); g.strokeStyle = 'rgba(0,0,0,.5)'; g.lineWidth = 1.5; g.stroke();
-    g.fillStyle = club.ink === '#111' ? '#111' : '#fff'; g.font = '700 11px Inter'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(p.num, x, y + 0.5);
-    g.font = '600 11px Inter'; g.fillStyle = 'rgba(255,255,255,.82)'; g.fillText(sur(p.p.name), x, y + 25);
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x + 2, y + R, R, R * 0.42, 0, 0, 7); g.fill();
+    if (p === sim.holder) { g.strokeStyle = '#fff'; g.lineWidth = sm ? 4 : 3; g.beginPath(); g.arc(x, y, R + 4, 0, 7); g.stroke(); }
+    g.fillStyle = club.color; g.beginPath(); g.arc(x, y, R, 0, 7); g.fill(); g.strokeStyle = 'rgba(0,0,0,.5)'; g.lineWidth = 1.5; g.stroke();
+    g.fillStyle = club.ink === '#111' ? '#111' : '#fff'; g.font = `700 ${sm ? 23 : 12}px Geist`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(p.num, x, y + 0.5);
+    if (!sm) { g.font = '600 11px Geist'; g.fillStyle = 'rgba(255,255,255,.82)'; g.fillText(sur(p.p.name), x, y + 28); }
   }
   g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(X(b.x) + 2, Y(b.y) + 6, 6, 3, 0, 0, 7); g.fill();
-  g.fillStyle = '#fff'; g.beginPath(); g.arc(X(b.x), Y(b.y), 6, 0, 7); g.fill(); g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 1; g.stroke();
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(X(b.x), Y(b.y), sm ? 12 : 6, 0, 7); g.fill(); g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 1; g.stroke();
   const vg = g.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.72); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.5)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
   if (sim.flash > 0.01) { g.fillStyle = `rgba(255,255,255,${sim.flash * 0.5})`; g.fillRect(0, 0, W, H); sim.flash *= Math.pow(0.9, f); }
   requestAnimationFrame(frame);
 }
 function drawMom() {
-  const c = $('#mom'); if (!c || !sim) return; const W = 1000, H = 120, g = fit(c, W, H), mid = H / 2, bw = (W - 20) / 90;
+  const c = $('#mom'); if (!c || !sim) return; const sm = c.clientWidth && c.clientWidth < 560, W = 1000, H = sm ? 240 : 120, g = fit(c, W, H), mid = H / 2, bw = (W - 20) / 90;
   g.fillStyle = '#1B1F27'; g.fillRect(0, 0, W, H);
   g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(10, mid, W - 20, 1);
   g.strokeStyle = 'rgba(255,255,255,.2)'; g.setLineDash([4, 5]); g.beginPath(); g.moveTo(10 + bw * 45, 6); g.lineTo(10 + bw * 45, H - 6); g.stroke(); g.setLineDash([]);
-  sim.mom.forEach((m, i) => { const h = clamp(Math.abs(m.v) * 15, 3, mid - 8), x = 10 + bw * i; g.fillStyle = m.v >= 0 ? M.home.club.color : M.away.club.color; rr(g, x + 1, m.v >= 0 ? mid - h : mid + 1, bw - 2, h, 2); g.fill(); if (m.goal !== undefined) { g.fillStyle = '#3D5BFF'; g.beginPath(); g.arc(x + bw / 2, m.goal === 0 ? 9 : H - 9, 5, 0, 7); g.fill(); } });
-  g.font = '600 10px JetBrains Mono, monospace'; g.fillStyle = 'rgba(255,255,255,.55)'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText(M.home.club.short, 12, 14); g.fillText(M.away.club.short, 12, H - 6);
+  sim.mom.forEach((m, i) => { const h = clamp(Math.abs(m.v) * (sm ? 30 : 15), 3, mid - 8), x = 10 + bw * i; g.fillStyle = m.v >= 0 ? M.home.club.color : M.away.club.color; rr(g, x + 1, m.v >= 0 ? mid - h : mid + 1, bw - 2, h, 2); g.fill(); if (m.goal !== undefined) { g.fillStyle = '#3D5BFF'; g.beginPath(); g.arc(x + bw / 2, m.goal === 0 ? (sm ? 14 : 9) : H - (sm ? 14 : 9), sm ? 10 : 5, 0, 7); g.fill(); } });
+  g.font = `600 ${sm ? 24 : 10}px Geist Mono, monospace`; g.fillStyle = 'rgba(255,255,255,.55)'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText(M.home.club.short, 14, sm ? 30 : 14); g.fillText(M.away.club.short, 14, H - (sm ? 12 : 6));
 }
 function planCard(club, p, label) {
   return `<div class="rival"><img src="${IMG[club.id]}" alt=""><div><b>${club.manager}</b><div class="small">${label}${p.fallback ? ' (offline)' : ''}</div></div></div>
@@ -513,7 +586,7 @@ async function play() {
   M = newMatch(fx.home ? mine : theirs, fx.home ? theirs : mine, 1000 + state.md * 77 + (Date.now() % 1000));
   M.meIdx = fx.home ? 0 : 1; M.oppIdx = 1 - M.meIdx; M.oppId = oppId; M.prePlan = plan;
   const ov = document.createElement('div'); ov.className = 'overlay';
-  ov.innerHTML = `<div class="obg" style="background-image:url(/img/stadium.jpg)"></div><div class="versus"><div class="line">${crest(M.home.club, 80)}<h2>${M.home.club.name}</h2><span class="v">V</span><h2>${M.away.club.name}</h2>${crest(M.away.club, 80)}</div><div class="q">"${esc(plan.quote)}"</div><div class="who">${opp.manager}, ${opp.name} · lines up ${plan.formation}, ${plan.mentality.toLowerCase()}, ${plan.press.toLowerCase()} press</div></div>`;
+  ov.innerHTML = `<div class="obg photo" style="background-image:url(/img/stadium.jpg)"></div><div class="versus"><div class="line">${crest(M.home.club, 80)}<h2>${M.home.club.name}</h2><span class="v">V</span><h2>${M.away.club.name}</h2>${crest(M.away.club, 80)}</div><div class="q">"${esc(plan.quote)}"</div><div class="who">${opp.manager}, ${opp.name} · lines up ${plan.formation}, ${plan.mentality.toLowerCase()}, ${plan.press.toLowerCase()} press</div></div>`;
   document.body.appendChild(ov);
   app.innerHTML = topbar() + `<div class="wrap">
     <div class="tile"><div class="sb">
@@ -523,15 +596,15 @@ async function play() {
       <div class="prog" id="prog" style="width:0"></div>
     </div></div>
     <div class="cc">
-      <div class="tile"><div class="th">Your XI <span class="mono" style="font-size:11px">FIT · RATING</span></div><div class="tb" style="padding:6px 14px" id="xi"></div></div>
+      <div class="tile t-xi"><div class="th">Your XI <span>FIT · RATING</span></div><div class="tb" id="xi"></div></div>
       <div class="tg">
-        <div class="tile pitchbox"><canvas id="mc" width="2000" height="1240"></canvas><div class="goalban" id="gb"><div><b>GOAL</b><span id="gbt"></span></div></div></div>
-        <div class="tile"><div class="th">Match momentum</div><canvas id="mom"></canvas></div>
+        <div class="tile pitchbox t-pitch"><canvas id="mc" width="2000" height="1240"></canvas><div class="goalban" id="gb"><div><b>GOAL</b><span id="gbt"></span></div></div></div>
+        <div class="tile t-mom"><div class="th">Match momentum</div><canvas id="mom"></canvas></div>
       </div>
       <div class="tg">
-        <div class="tile"><div class="th">Opposition dugout</div><div class="tb" id="rival">${planCard(opp, plan, 'Pre-match plan')}</div></div>
-        <div class="tile"><div class="th">Match stats</div><div class="tb" id="stats" style="padding-bottom:6px"></div></div>
-        <div class="tile"><div class="th">Commentary</div><div class="feed" id="feed"></div></div>
+        <div class="tile t-rival"><div class="th">Opposition dugout</div><div class="tb" id="rival">${planCard(opp, plan, 'Pre-match plan')}</div></div>
+        <div class="tile t-stats"><div class="th">Match stats</div><div class="tb" id="stats" style="padding-bottom:8px"></div></div>
+        <div class="tile t-feed"><div class="th">Commentary</div><div class="feed" id="feed"></div></div>
       </div>
     </div></div>`;
   bindTop();
@@ -592,7 +665,7 @@ function halftime() {
   const roomHtml = (eff) => me.xi.map((p) => { const e = (eff || []).find((x) => x.name === p.name), r = rat(p); return `<div class="pr"><div class="l1">${face(p, 34)}<b>${esc(p.name)}</b>${e ? `<span class="delta ${e.change.startsWith('+') ? 'up' : 'down'}">${e.change}</span>` : ''}<span class="pill ${ratCls(r)}">${r.toFixed(1)}</span><span class="pill ${morCls(p.morale)}" title="Morale">M ${p.morale}</span></div><div class="tr">${p.slot} · ${p.age} · ${p.trait}</div>${e ? `<div class="why">${esc(e.reason)}</div>` : ''}</div>`; }).join('');
   const ov = document.createElement('div'); ov.className = 'overlay';
   ov.innerHTML = `<div class="obg" style="background-image:url(/img/dressing.jpg)"></div><div class="modal">
-    <div class="mh"><div><div class="small mono">HALF-TIME · ${M.home.club.short} ${M.score[0]}–${M.score[1]} ${M.away.club.short}</div><div class="cond" style="font-size:32px;font-weight:800;line-height:1.1">The dressing room</div></div>
+    <div class="mh"><div><div class="small mono">HALF-TIME · ${M.home.club.short} ${M.score[0]}–${M.score[1]} ${M.away.club.short}</div><div class="cond" style="font-size:30px;line-height:1.1;margin-top:4px">The dressing room</div></div>
       <div class="status" id="htstat"><span class="pulse"></span>${opp.manager} is re-thinking next door…</div></div>
     <div class="mgrid">
       <div class="tg">
@@ -600,10 +673,9 @@ function halftime() {
           <div class="quick">${['Keep doing this. Stay calm and trust the plan.', 'That was not good enough. I want more from everyone.', 'Brilliant half. Proud of you. Go and finish it.', 'Forget the score. Win your own battle out there.'].map((t) => `<button>${t}</button>`).join('')}</div></div>
         <div class="two"><div><label>MENTALITY</label>${seg('mentality', ['Defensive', 'Balanced', 'Attacking'])}</div><div><label>PRESS</label>${seg('press', ['Low', 'Mid', 'High'])}</div></div>
         <div><label>ATTACK THROUGH</label>${seg('attack_lane', ['Left', 'Centre', 'Right'])}</div>
-        <button class="btn wide" id="out">Give the talk</button>
       </div>
       <div><div id="tone" class="tg"><label>THE ROOM · FIRST-HALF RATING · MORALE</label></div><div class="room" id="room">${roomHtml()}</div></div>
-    </div></div>`;
+    </div><div class="mf"><button class="btn wide" id="out">Give the talk</button></div></div>`;
   document.body.appendChild(ov);
   htP.then(() => { const s = $('#htstat'); if (s) s.innerHTML = `<span class="pulse ok"></span>${opp.manager} has made a decision.`; });
   ov.querySelectorAll('.quick button').forEach((b) => (b.onclick = () => ($('#talk').value = b.textContent)));
@@ -619,6 +691,7 @@ function halftime() {
       $('#tone').innerHTML = `<div><div class="tone" style="color:${talkRes.blocked ? 'var(--red)' : 'var(--lime)'}">${talkRes.blocked ? 'Blocked' : esc(talkRes.tone)}</div><p style="font-size:14.5px;line-height:1.5;margin-bottom:10px">${esc(talkRes.room)}</p></div>`;
       $('#room').innerHTML = roomHtml(talkRes.effects);
       given = true; $('#out').disabled = false; $('#out').textContent = 'Second half';
+      if (innerWidth <= 820) $('#tone').scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     $('#out').disabled = true; $('#out').textContent = `Waiting for ${opp.manager}…`;
@@ -647,24 +720,24 @@ function fulltime() {
   state.history.push({ opp: opp.name, score: [M.score[me], M.score[op]], t: { ...myT }, lanePct: `Their attacks went ${Math.round((L.Left / lt) * 100)}% left, ${Math.round((L.Centre / lt) * 100)}% centre, ${Math.round((L.Right / lt) * 100)}% right`, poss: Math.round((M.poss[me] / tot) * 100), shots: M.shots[me], xg: M.xg[me].toFixed(2) });
   Object.assign(state.tactics, { mentality: myT.mentality, press: myT.press, attack_lane: myT.attack_lane });
   const res = M.score[me] > M.score[op] ? 'WIN' : M.score[me] < M.score[op] ? 'DEFEAT' : 'DRAW';
-  const rc = res === 'WIN' ? 'background:var(--lime);color:#fff' : res === 'DEFEAT' ? 'background:var(--red);color:#fff' : 'background:var(--panel2);color:var(--ink)';
+  const rc = res === 'WIN' ? 'background:#fff;color:#0C0C0C' : res === 'DEFEAT' ? 'background:var(--red);color:#fff' : 'background:var(--panel2);color:var(--ink)';
   const notes = (p, lab) => (p ? `<div class="sec">${lab} · ${p.formation} · ${p.mentality} · ${p.press} press · attack ${p.attack_lane}${p.mark && p.mark !== 'None' ? ' · mark ' + esc(sur(p.mark)) : ''}</div><div class="tl">${p.notes.map((n, i) => `<div class="nt" style="animation-delay:${i * 0.08}s"><div class="s"><span class="k">SAW</span>${esc(n.saw)}</div><div class="d"><span class="k">DECIDED</span>${esc(n.decided)}</div></div>`).join('')}</div>` : '');
   const all = [...M.home.xi.map((p) => ({ p, c: M.home.club })), ...M.away.xi.map((p) => ({ p, c: M.away.club }))].sort((a, b) => rat(b.p) - rat(a.p)).slice(0, 5);
   const ph = Math.round((M.poss[0] / tot) * 100), last = state.md === FIXTURES.length - 1;
   const sc = (side) => M.scorers.filter((s) => s.side === side).map((s) => `${esc(sur(s.name))} ${s.min}'`).join(', ');
-  const strow = (lab, a, b) => `<div class="row"><span class="pill" style="min-width:52px">${a}</span><span class="nm" style="text-align:center;color:var(--mute);font:600 11px 'JetBrains Mono';letter-spacing:.08em">${lab}</span><span class="pill" style="min-width:52px">${b}</span></div>`;
+  const strow = (lab, a, b) => `<div class="row"><span class="pill" style="min-width:52px">${a}</span><span class="nm" style="text-align:center;color:var(--mute);font:600 11px 'Geist Mono';letter-spacing:.08em">${lab}</span><span class="pill" style="min-width:52px">${b}</span></div>`;
   app.innerHTML = topbar() + `<div class="wrap">
-    <section class="hero"><div class="hin"><span class="res" style="${rc}">FULL-TIME · ${res}</span><div class="paper">THE MORNING PAPERS</div><div class="headline">${res === 'WIN' ? (M.score[me] - M.score[op] >= 2 ? `Ashford tear ${esc(opp.name)} apart` : `${esc(MG.name)} outwits ${esc(opp.manager.split(' ')[1])}`) : res === 'DRAW' ? `Honours even as title race tightens` : `${esc(opp.manager.split(' ')[1])} reads ${esc(MG.name)} like a book`}</div>
-      <div class="ft">${crest(M.home.club, 64)}<div style="text-align:right"><h2>${M.home.club.name}</h2><div class="small">${sc(0)}</div></div><div class="n ftscore">${M.score[0]}–${M.score[1]}</div><div style="text-align:left"><h2>${M.away.club.name}</h2><div class="small">${sc(1)}</div></div>${crest(M.away.club, 64)}</div>
-      <div class="small" style="margin-top:8px">Elsewhere: ${CLUBS[o1].name} ${os[0]}–${os[1]} ${CLUBS[o2].name}</div></div></section>
+    <section class="hero photo"><div class="hin"><span class="res" style="${rc}">FULL-TIME · ${res}</span><div class="paper">THE MORNING PAPERS</div><div class="headline">${res === 'WIN' ? (M.score[me] - M.score[op] >= 2 ? `Ashford tear ${esc(opp.name)} apart` : `${esc(MG.name)} outwits ${esc(opp.manager.split(' ')[1])}`) : res === 'DRAW' ? `Honours even as title race tightens` : `${esc(opp.manager.split(' ')[1])} reads ${esc(MG.name)} like a book`}</div>
+      <div class="ft"><div class="tm">${crest(M.home.club, 60)}<div><h2>${M.home.club.name}</h2><div class="small">${sc(0)}</div></div></div><div class="n ftscore">${M.score[0]}–${M.score[1]}</div><div class="tm r"><div><h2>${M.away.club.name}</h2><div class="small">${sc(1)}</div></div>${crest(M.away.club, 60)}</div></div>
+      <div class="small" style="margin-top:16px">Elsewhere: ${CLUBS[o1].name} ${os[0]}–${os[1]} ${CLUBS[o2].name}</div></div></section>
     <div class="end">
       <div class="tg">
-        <div class="tile"><div class="th">Match stats <span class="mono" style="font-size:11px">${M.home.club.short} · ${M.away.club.short}</span></div><div class="tb" style="padding:6px 16px">${strow('POSSESSION', ph + '%', 100 - ph + '%')}${strow('SHOTS', M.shots[0], M.shots[1])}${strow('EXPECTED GOALS', M.xg[0].toFixed(2), M.xg[1].toFixed(2))}</div></div>
-        <div class="tile"><div class="th">Best on the pitch</div><div class="tb" style="padding:6px 16px">${all.map(({ p, c }) => `<div class="row">${crest(c, 16)}<span class="nm">${esc(p.name)}</span><span class="pos">${p.slot}</span><span class="pill ${ratCls(rat(p))}">${rat(p).toFixed(1)}</span></div>`).join('')}</div></div>
-        <div class="tile"><div class="th">League table</div><div class="tb" style="padding:8px 14px">${tableHtml()}</div></div>
-        <button class="btn wide" id="nx">${last ? 'Final standings' : 'Next match'}</button>
+        <div class="tile e-stats"><div class="th">Match stats <span>${M.home.club.short} · ${M.away.club.short}</span></div><div class="tb">${strow('POSSESSION', ph + '%', 100 - ph + '%')}${strow('SHOTS', M.shots[0], M.shots[1])}${strow('EXPECTED GOALS', M.xg[0].toFixed(2), M.xg[1].toFixed(2))}</div></div>
+        <div class="tile e-best"><div class="th">Best on the pitch</div><div class="tb">${all.map(({ p, c }) => `<div class="row">${crest(c, 20)}<span class="nm">${esc(p.name)}</span><span class="pos">${p.slot}</span><span class="pill ${ratCls(rat(p))}">${rat(p).toFixed(1)}</span></div>`).join('')}</div></div>
+        <div class="tile e-table"><div class="th">League table</div><div class="tb">${tableHtml()}</div></div>
+        <div class="dock"><button class="btn wide" id="nx">${last ? 'Final standings' : 'Next match'}</button></div>
       </div>
-      <div class="tile"><div class="th">${opp.manager}'s notebook <span class="mono" style="font-size:11px;color:var(--lime)">SERV REASONING</span></div><div class="tb">
+      <div class="tile e-note"><div class="th">${opp.manager}'s notebook <span style="color:var(--lime)">SERV REASONING</span></div><div class="tb">
         <div class="rival"><img src="${IMG[opp.id]}" alt=""><div class="small">Every decision ${first} made in this match, each one tied to the fact that caused it. ${first} read the same report and match stats you can see.</div></div>
         ${notes(M.prePlan, 'BEFORE KICK-OFF')}${notes(M.htPlan, 'AT HALF-TIME')}
         <details><summary>The scouting report ${first} was given</summary><pre>${esc(M.prePlan.report)}</pre></details>
@@ -681,9 +754,9 @@ function season() {
   const msg = pos === 1 ? `Three games, last season's top three, and Ashford Town lead the league. Three managers studied ${who}, countered and changed things at half-time. None of them could stop it.` : pos <= 4 ? `Ashford sit ${ord(pos)} after the hardest start in the division. The chairman wanted top spot, and one of those managers read ${who} a little too well.` : `Ashford are ${ord(pos)} after three games. Mr Halloran has thanked ${who} for the effort and cleared the office.`;
   const share = encodeURIComponent(`I finished ${ord(pos)} in Touchline, a football manager where every rival manager thinks for itself on @openservai SERV Reasoning. Can you win the league? ${location.origin}`);
   app.innerHTML = topbar() + `<section class="season" style="background-image:url(/img/${img}.jpg)"><div class="in">
-    <div class="cond" style="color:var(--lime);font-size:16px;letter-spacing:.14em;margin-bottom:8px">Final standings · ${ord(pos)} place</div>
+    <div class="eyebrow">Final standings · ${ord(pos)} place</div>
     <h1>${head}</h1><p style="margin:14px 0 18px;font-size:17px;line-height:1.5;color:#D5DBD3">${msg}</p>
-    <div class="tile"><div class="tb" style="padding:8px 14px">${tableHtml()}</div></div>
+    <div class="tile"><div class="tb" style="padding-top:10px">${tableHtml()}</div></div>
     <div class="small mono" style="margin-top:12px">${ledger.calls} SERV decisions · $${ledger.cost.toFixed(4)} total · ${ledger.blocked} team talk${ledger.blocked === 1 ? '' : 's'} blocked by Prompt Guard</div>
     <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><a class="btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=${share}">Share result</a><button class="btn ghost" id="again">New season</button></div>
   </div></section>`;
